@@ -127,7 +127,7 @@ void handleInterrupt1() {
         Gesamtanzahl = Gesamtanzahl - 1;
       else (Gesamtanzahl = 0);
       // Serial.print("Im Turm befindliche Fledermaeuse: ");
-      Serial.print(Gesamtanzahl);
+      Serial.println(Gesamtanzahl);
       EEPROM.put(EEPROMAddr, Gesamtanzahl);
     }
   } else
@@ -214,7 +214,7 @@ void handleInterrupt2() {
       // Serial.print("Im Turm befindliche Fledermaeuse: ");
       ///////////////////////// Von uns auskommentiert /////////////////////////
       
-      Serial.print(Gesamtanzahl);
+      Serial.println(Gesamtanzahl);
       EEPROM.put(EEPROMAddr, Gesamtanzahl);
 
     } else if (erkennungsZustand == ausS1hS2l) {
@@ -328,7 +328,7 @@ void setup() {
   // Serial.println("Programm gestartet.");
   // Serial.print("Im Turm befindliche Fledermaeuse: ");
   
-  Serial.print(Gesamtanzahl);
+  Serial.println(Gesamtanzahl);
 
   // wir sind in keinem Zwischenzustand
   stateEntryTime = 0;
@@ -476,7 +476,7 @@ void loop() {
     // Serial.print("Im Turm befindliche Fledermaeuse: ");
     ///////////////////////// Von uns auskommentiert /////////////////////////
 
-    Serial.print(Gesamtanzahl);
+    Serial.println(Gesamtanzahl);
     previousSerialWriteTime = millis();
   }
   // delay(5); // 5 ms warten

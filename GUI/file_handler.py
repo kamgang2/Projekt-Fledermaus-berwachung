@@ -1,4 +1,4 @@
-import serial
+import serial  # install with " pip3 install pyserial"
 import time
 
 # Configure the serial port and the baud rate
@@ -15,15 +15,15 @@ except serial.SerialException as e:
     print(f"Error opening serial port {serial_port}: {e}")
     exit(1)
 
-  # Read a line from the serial port
-line = ser.readline().decode('utf-8').strip()
+
 
 # Open the file to write the data
 with open(output_file, 'a') as file:
     try:
         while True:
             if ser.in_waiting > 0:
-              
+                # Read a line from the serial port
+                line = ser.readline().decode('utf-8').strip() 
                 # Print the line to the console
                 print(line)
                 # Write the line to the file
