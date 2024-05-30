@@ -1,5 +1,8 @@
 import serial  # install with " pip3 install pyserial"
 import time
+import datetime
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Configure the serial port and the baud rate
 serial_port = 'COM4'  # Replace with your serial port
@@ -24,10 +27,12 @@ with open(output_file, 'a') as file:
             if ser.in_waiting > 0:
                 # Read a line from the serial port
                 line = ser.readline().decode('utf-8').strip() 
+                timestamp = datetime.datetime.now()
                 # Print the line to the console
-                print(line)
+                myDataLine =timestamp.strftime("%d-%m-%Y %H:%M:%S")+","+ line
+                print(myDataLine)
                 # Write the line to the file
-                file.write(line + '\n')
+                file.write(myDataLine + '\n')
             else:
                 print("No data waiting in the serial buffer.")
             time.sleep(1)  # Add a small delay to prevent high CPU usage
@@ -38,3 +43,10 @@ with open(output_file, 'a') as file:
     finally:
         ser.close()
         print(f"Disconnected from {serial_port}.")
+
+
+
+
+
+
+    

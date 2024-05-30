@@ -127,6 +127,12 @@ void handleInterrupt1() {
         Gesamtanzahl = Gesamtanzahl - 1;
       else (Gesamtanzahl = 0);
       // Serial.print("Im Turm befindliche Fledermaeuse: ");
+      
+      Serial.print("->");
+      Serial.print(anzahlEinfluege);
+      Serial.print(", <-");
+      Serial.print(anzahlAusfluege);
+      Serial.print(", $");
       Serial.println(Gesamtanzahl);
       EEPROM.put(EEPROMAddr, Gesamtanzahl);
     }
@@ -214,6 +220,11 @@ void handleInterrupt2() {
       // Serial.print("Im Turm befindliche Fledermaeuse: ");
       ///////////////////////// Von uns auskommentiert /////////////////////////
       
+    Serial.print("->");
+      Serial.print(anzahlEinfluege);
+      Serial.print(", <-");
+      Serial.print(anzahlAusfluege);
+      Serial.print(", $");
       Serial.println(Gesamtanzahl);
       EEPROM.put(EEPROMAddr, Gesamtanzahl);
 
@@ -476,7 +487,12 @@ void loop() {
     // Serial.print("Im Turm befindliche Fledermaeuse: ");
     ///////////////////////// Von uns auskommentiert /////////////////////////
 
-    Serial.println(Gesamtanzahl);
+   Serial.print("->");
+      Serial.print(anzahlEinfluege);
+      Serial.print(", <-");
+      Serial.print(anzahlAusfluege);
+      Serial.print(", $");
+      Serial.println(Gesamtanzahl);
     previousSerialWriteTime = millis();
   }
   // delay(5); // 5 ms warten
