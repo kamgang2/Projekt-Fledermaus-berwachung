@@ -5,17 +5,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Configure the serial port and the baud rate
-serial_port = 'COM4'  # Replace with your serial port
+serial_port1 = 'COM4'  # Replace with your serial port
+serial_port2 = 'COM5'
 baud_rate = 9600
 output_file = 'serial_data.txt'
 
 try:
     # Open the serial port
-    ser = serial.Serial(serial_port, baud_rate)
+    ser1 = serial.Serial(serial_port1, baud_rate)
+    ser2 = serial.Serial(serial_port2, baud_rate)
     time.sleep(2)  # Wait for the serial connection to initialize
-    print(f"Connected to {serial_port} at {baud_rate} baud.")
+    print(f"Connected to {serial_port1} at {baud_rate} baud.")
+    print(f"Connected to {serial_port2} at {baud_rate} baud.")
 except serial.SerialException as e:
-    print(f"Error opening serial port {serial_port}: {e}")
+    print(f"Error opening serial port {serial_port1}: {e}")
+    print(f"Error opening serial port {serial_port2}: {e}")
     exit(1)
 
 
@@ -24,12 +28,13 @@ except serial.SerialException as e:
 with open(output_file, 'a') as file:
     try:
         while True:
-            if ser.in_waiting > 0:
+            if ser1.in_waiting > 0 and ser2.in_waiting > 0:
                 # Read a line from the serial port
-                line = ser.readline().decode('utf-8').strip() 
+                line1 = ser1.readline().decode('utf-8').strip() 
+                line2 = ser2.readline().decode('utf-8').strip()
                 timestamp = datetime.datetime.now()
                 # Print the line to the console
-                myDataLine =timestamp.strftime("%d-%m-%Y %H:%M:%S")+","+ line
+                myDataLine =timestamp.strftime("%d-%m-%Y %H:%M:%S")+","+ line1 +","+ line2
                 print(myDataLine)
                 # Write the line to the file
                 file.write(myDataLine + '\n')
@@ -41,8 +46,8 @@ with open(output_file, 'a') as file:
     except serial.SerialException as e:
         print(f"Serial communication error: {e}")
     finally:
-        ser.close()
-        print(f"Disconnected from {serial_port}.")
+        ser1.close()
+        print(f"Disconnected from {serial_port1}.")
 
 
 

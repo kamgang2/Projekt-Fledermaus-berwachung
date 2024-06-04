@@ -24,7 +24,7 @@ void setup() {
 
   // Ausgabe auf Seriellen Monitor
   Serial.begin(9600);
-  Serial.println(F("DHT22 test!"));
+  //Serial.println(F("DHT22 test!"));
 
   // DHT Sensoren auslesen
   dht1.begin();
@@ -60,18 +60,18 @@ void loop() {
   }
   else
   {
-    Serial.println(F("DHT_1 hat folgende Werte"));
-    Serial.print(F("Luftfeuchtigkeit: "));
-    Serial.print(h1);
-    Serial.print(F("%  Temperatur: "));
-    Serial.print(t1);
-    Serial.print(F("°C "));
-    Serial.print(f1);
-    Serial.println(F("°F"));
+    // Serial.println(F("DHT_1 hat folgende Werte"));
+    // Serial.print(F("Luftfeuchtigkeit: "));
+    // Serial.print(h1);
+    // Serial.print(F("%  Temperatur: "));
+    // Serial.print(t1);
+    // Serial.print(F("°C "));
+    // Serial.print(f1);
+    // Serial.println(F("°F"));
   }
 
 
-  // 2. DHT Sensor
+  // 2. DHT Sensorf
   float h2 = dht2.readHumidity();
   // Read temperature as Celsius (the default)
   float t2 = dht2.readTemperature();
@@ -85,14 +85,14 @@ void loop() {
   }
   else
   {
-    Serial.println(F("DHT_2 hat folgende Werte"));
-    Serial.print(F("Luftfeuchtigkeit: "));
-    Serial.print(h2);
-    Serial.print(F("%  Temperatur: "));
-    Serial.print(t2);
-    Serial.print(F("°C "));
-    Serial.print(f2);
-    Serial.println(F("°F"));
+    // Serial.println(F("DHT_2 hat folgende Werte"));
+    // Serial.print(F("Luftfeuchtigkeit: "));
+    // Serial.print(h2);
+    // Serial.print(F("%  Temperatur: "));
+    // Serial.print(t2);
+    // Serial.print(F("°C "));
+    // Serial.print(f2);
+    // Serial.println(F("°F"));
   }
 
   
@@ -110,14 +110,14 @@ void loop() {
   }
   else
   {
-    Serial.println(F("DHT_3 hat folgende Werte"));
-    Serial.print(F("Luftfeuchtigkeit: "));
-    Serial.print(h3);
-    Serial.print(F("%  Temperatur: "));
-    Serial.print(t3);
-    Serial.print(F("°C "));
-    Serial.print(f3);
-    Serial.println(F("°F"));
+    // Serial.println(F("DHT_3 hat folgende Werte"));
+    // Serial.print(F("Luftfeuchtigkeit: "));
+    // Serial.print(h3);
+    // Serial.print(F("%  Temperatur: "));
+    // Serial.print(t3);
+    // Serial.print(F("°C "));
+    // Serial.print(f3);
+    // Serial.println(F("°F"));
   }
 
 
@@ -125,10 +125,10 @@ void loop() {
   float h_ges = (h1 + h2 + h3)/3;
   float t_ges = (t1 + t2 + t3)/3;
   
-  Serial.println(F("Gesamtwerte"));
-  Serial.print(F("Durchschnittliche Luftfeuchtigkeit: "));
+  //Serial.println(F("Gesamtwerte"));
+  //Serial.print(F("Durchschnittliche Luftfeuchtigkeit: "));
   Serial.print(h_ges);
-  Serial.print(F("%  Durschschnittstemperatur: "));
+  Serial.print(F("%,"));
   Serial.print(t_ges);
   Serial.println(F("°C "));
 
