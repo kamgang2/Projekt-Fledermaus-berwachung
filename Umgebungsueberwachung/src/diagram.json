@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 158.52, "left": -202.69, "attrs": {} },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -86.1,
+      "left": -115.6,
+      "attrs": { "humidity": "57", "temperature": "19.1" }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht2",
+      "top": -86.1,
+      "left": -240.4,
+      "attrs": { "temperature": "21.2", "humidity": "67.5" }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht3",
+      "top": -86.1,
+      "left": 9.2,
+      "attrs": { "temperature": "20.2", "humidity": "82.5" }
+    }
+  ],
+  "connections": [
+    [ "dht2:VCC", "uno:5V", "black", [ "v335.75", "h191.07" ] ],
+    [ "dht1:GND", "dht3:GND", "blue", [ "v33.1", "h143.52" ] ],
+    [ "dht2:VCC", "dht1:VCC", "black", [ "v32.94", "h122.64" ] ],
+    [ "dht2:VCC", "dht3:VCC", "black", [ "v56.16", "h266.16" ] ],
+    [ "dht3:SDA", "uno:7", "red", [ "v22.99", "h-50.8", "v115.73" ] ],
+    [ "dht2:GND", "uno:GND.1", "blue", [ "v105.6", "h105.21" ] ],
+    [ "dht1:SDA", "uno:4", "gold", [ "v93.12", "h109.9" ] ],
+    [ "uno:2", "dht2:SDA", "green", [ "v-23.52", "h-254.61" ] ],
+    [ "dht2:GND", "dht1:GND", "blue", [ "v19.2", "h115.6" ] ]
+  ]
+}

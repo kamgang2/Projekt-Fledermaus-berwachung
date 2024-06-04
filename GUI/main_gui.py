@@ -40,8 +40,8 @@ class MainWindow(QMainWindow):
 
         # Plotten der Daten mit Matplotlib und dynamische Anpassung der Größe
         fig, ax = plt.subplots(figsize=(width / 100, height / 100))
-        ax.plot(self.zeiten, self.yeinDaten, label='Ein Daten')
-        ax.plot(self.zeiten, self.yausDaten, label='Aus Daten')
+        ax.plot(self.zeiten, self.yeinDaten, label='Ein Daten', color='green')
+        ax.plot(self.zeiten, self.yausDaten, label='Aus Daten', color= 'red')
         ax.set_xlabel('Zeit')
         ax.set_ylabel('Werte')
         ax.set_title('Ein- und Aus-Daten über die Zeit')
