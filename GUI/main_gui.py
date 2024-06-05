@@ -1,5 +1,6 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene
+from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber
 from PySide6.QtGui import QPixmap
+from PySide6 import QtGui
 from ui_mainwindow import Ui_MainWindow
 import sys 
 import numpy as np 
@@ -12,8 +13,22 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
+        #Menubar and Memus 
+        menubar = self.menuBar()
+         # Erstellen des Datei-Menüs und seiner Aktionen
+        file_menu = menubar.addMenu('&Datei')
+        view_menu = menubar.addMenu("Ansicht") 
+
         # Verknüpfen des Plot-Buttons mit der plot_data Methode
         self.ui.plotButton.clicked.connect(self.plot_data)
+       
+        # Setze die Textfarbe des QLCDNumber-Widgets
+        self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
+       
+        self.ui.lcdGesamtzahl.display(0)  # Initialisiere das Display mit 0
+        palette = self.ui.lcdGesamtzahl.palette()
+        palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor("red"))  # Ändere die Textfarbe auf Rot
+        self.ui.lcdGesamtzahl.setPalette(palette)
         
         self.data = None
         self.yeinDaten = None
@@ -32,7 +47,7 @@ class MainWindow(QMainWindow):
             self.data = self.data_lesen()
             if not self.data:
                 return
-            self.yeinDaten, self.yausDaten, self.zeiten = self.process_data(self.data)
+            self.yeinDaten, self.yausDaten, self.zeiten, gesamtzahl = self.process_data(self.data)
 
         # Größe der QGraphicsView abfragen
         view_size = self.ui.graphicsView.size()
@@ -61,6 +76,9 @@ class MainWindow(QMainWindow):
         # Anzeigen der Szene in der QGraphicsView
         self.ui.graphicsView.setScene(scene)
 
+        # Gesamtzahl 
+        self.ui.lcdGesamtzahl.display(gesamtzahl)
+
     def data_lesen(self):
         # Öffnen der Datei im Lesemodus
         try:
@@ -83,6 +101,7 @@ class MainWindow(QMainWindow):
         yeinDaten = []
         yausDaten = []
         zeiten = []
+        gesamtzahl = 0 
 
         for line in daten:
             verkehr = line.split(",")
@@ -96,9 +115,12 @@ class MainWindow(QMainWindow):
                 zeiten.append(zeit)
                 yeinDaten.append(yein)
                 yausDaten.append(yaus)
-
+        
+        last_line = daten[-1].split(",")
+        if len(last_line) >= 4: 
+            gesamtzahl = int(last_line[3].strip().replace("$",""))
         # Rückgabe der Listen
-        return yeinDaten, yausDaten, zeiten
+        return yeinDaten, yausDaten, zeiten, gesamtzahl
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

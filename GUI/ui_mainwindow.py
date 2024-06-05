@@ -16,7 +16,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGraphicsView, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QWidget, QVBoxLayout, QPushButton)
+    QSizePolicy, QStatusBar, QWidget, QVBoxLayout, QPushButton, QLCDNumber, QGridLayout)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -24,14 +24,22 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(800,600)
 
+       
+
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
 
-        self.layout = QVBoxLayout(self.centralwidget)
+        self.layout = QGridLayout(self.centralwidget)
+         
 
         self.graphicsView = QGraphicsView(self.centralwidget)
         self.graphicsView.setObjectName(u"graphicsView")
         self.layout.addWidget(self.graphicsView)
+
+        self.lcdGesamtzahl = QLCDNumber()
+        self.lcdGesamtzahl.setObjectName(u"lcdGesamtzahl")
+        self.layout.addWidget(self.lcdGesamtzahl)  
+
 
         self.plotButton = QPushButton("Plot Data", self.centralwidget)
         self.plotButton.setObjectName(u"plotButton")
