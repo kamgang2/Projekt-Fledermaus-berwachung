@@ -16,29 +16,44 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGraphicsView, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QWidget, QVBoxLayout, QPushButton, QLCDNumber, QGridLayout)
+    QSizePolicy, QStatusBar, QWidget, QVBoxLayout, QPushButton, QLCDNumber, QGridLayout, QLabel)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(800,600)
-
        
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
 
         self.layout = QGridLayout(self.centralwidget)
-         
 
-        self.graphicsView = QGraphicsView(self.centralwidget)
+        self.graphicsView = QGraphicsView()
         self.graphicsView.setObjectName(u"graphicsView")
-        self.layout.addWidget(self.graphicsView)
+        self.layout.addWidget(self.graphicsView, 0, 0, 10, 10)
+
+        self.lcdTemp = QLCDNumber()
+        self.lcdTemp.setObjectName(u"lcdTemp")
+        self.lcdTemp.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addWidget(self.lcdTemp, 0, 11, 2, 2)
+
+        self.TempLabel = QLabel("Temperature in °C")
+        self.TempLabel.setObjectName(u"TempLabel")
+        self.layout.addWidget(self.TempLabel, 2,11, 1, 2)
+
+        self.lcdLuft = QLCDNumber()
+        self.lcdLuft.setObjectName(u"lcdLuft")
+        self.layout.addWidget(self.lcdLuft,3,11,2,2)
+
+        self.LuftLabel = QLabel("Luftfeuchtigkeit in %")
+        self.TempLabel.setObjectName(u"LuftLabel")
+        self.layout.addWidget(self.LuftLabel, 5,11, 1, 2)
 
         self.lcdGesamtzahl = QLCDNumber()
         self.lcdGesamtzahl.setObjectName(u"lcdGesamtzahl")
-        self.layout.addWidget(self.lcdGesamtzahl)  
+        self.layout.addWidget(self.lcdGesamtzahl, 8,11, 2, 2)  
 
 
         self.plotButton = QPushButton("Plot Data", self.centralwidget)
