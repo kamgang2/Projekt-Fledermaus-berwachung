@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>839</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGraphicsView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>631</width>
+      <height>531</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcdTemp">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>10</y>
+      <width>131</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: skyblue</string>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>false</bool>
+    </property>
+    <property name="mode">
+     <enum>QLCDNumber::Mode::Oct</enum>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::SegmentStyle::Filled</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="TempLabel">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>130</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: </string>
+    </property>
+    <property name="text">
+     <string>Temperature in °C</string>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="TempProgessBar">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>10</y>
+      <width>31</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>24</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Orientation::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcdLuft">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>190</y>
+      <width>131</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: skyblue</string>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>false</bool>
+    </property>
+    <property name="mode">
+     <enum>QLCDNumber::Mode::Oct</enum>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::SegmentStyle::Filled</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="LuftLabel">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>310</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Luftfeuchgtigkeit in %</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcdGesamtzahl">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>360</y>
+      <width>131</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: skyblue</string>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>false</bool>
+    </property>
+    <property name="mode">
+     <enum>QLCDNumber::Mode::Oct</enum>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::SegmentStyle::Filled</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>480</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Anzahl der Fledermäuse</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="plotButton">
+    <property name="geometry">
+     <rect>
+      <x>654</x>
+      <y>510</y>
+      <width>111</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Plot Data</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>839</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDatei">
+    <property name="title">
+     <string>Datei</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAnsicht">
+    <property name="title">
+     <string>Ansicht</string>
+    </property>
+   </widget>
+   <addaction name="menuDatei"/>
+   <addaction name="menuAnsicht"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

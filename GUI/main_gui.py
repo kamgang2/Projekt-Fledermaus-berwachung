@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber
 from PySide6.QtGui import QPixmap
 from PySide6 import QtGui
-from ui_mainwindow import Ui_MainWindow
+from mainwindow import Ui_MainWindow
 import sys 
 import numpy as np 
 import matplotlib.pyplot as plt 
@@ -12,12 +12,6 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
-        #Menubar and Memus 
-        menubar = self.menuBar()
-         # Erstellen des Datei-Menüs und seiner Aktionen
-        file_menu = menubar.addMenu('&Datei')
-        view_menu = menubar.addMenu("Ansicht") 
 
         # Verknüpfen des Plot-Buttons mit der plot_data Methode
         self.ui.plotButton.clicked.connect(self.plot_data)
@@ -25,10 +19,10 @@ class MainWindow(QMainWindow):
         # Setze die Textfarbe des QLCDNumber-Widgets
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
        
-        self.ui.lcdGesamtzahl.display(0)  # Initialisiere das Display mit 0
-        palette = self.ui.lcdGesamtzahl.palette()
-        palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor("red"))  # Ändere die Textfarbe auf Rot
-        self.ui.lcdGesamtzahl.setPalette(palette)
+        # self.ui.lcdGesamtzahl.display(0)  # Initialisiere das Display mit 0
+        # palette = self.ui.lcdGesamtzahl.palette()
+        # palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor("skyblue"))  # Ändere die Textfarbe auf Rot
+        # self.ui.lcdGesamtzahl.setPalette(palette)
         
         self.data = None
         self.yeinDaten = None
@@ -47,19 +41,20 @@ class MainWindow(QMainWindow):
             self.data = self.data_lesen()
             if not self.data:
                 return
-            self.yeinDaten, self.yausDaten, self.zeiten, gesamtzahl = self.process_data(self.data)
+            self.yeinDaten, self.yausDaten, self.zeiten,self.yanzMäuser, gesamtzahl = self.process_data(self.data)
 
         # Größe der QGraphicsView abfragen
         view_size = self.ui.graphicsView.size()
         width, height = view_size.width(), view_size.height()
 
         # Plotten der Daten mit Matplotlib und dynamische Anpassung der Größe
-        fig, ax = plt.subplots(figsize=(width / 100, height / 100))
-        ax.plot(self.zeiten, self.yeinDaten, label='Ein Daten', color='green')
-        ax.plot(self.zeiten, self.yausDaten, label='Aus Daten', color= 'red')
+        fig, ax = plt.subplots(figsize=(width /90 , height/ 90 ))
+        ax.plot(self.zeiten, self.yeinDaten, label='Einfluege', color='green')
+        ax.plot(self.zeiten, self.yausDaten, label='Ausfluege', color= 'red')
+        ax.plot(self.zeiten, self.yanzMäuser, label = 'Anz Fledermausern', color = 'skyblue' )
         ax.set_xlabel('Zeit')
         ax.set_ylabel('Werte')
-        ax.set_title('Ein- und Aus-Daten über die Zeit')
+        ax.set_title('Ein- und Aus-Fluege über die Zeit')
         ax.legend()
         
         # Speichern des Plots in ein Bild
@@ -100,6 +95,7 @@ class MainWindow(QMainWindow):
     def process_data(self, daten):
         yeinDaten = []
         yausDaten = []
+        yanzMäuser = []
         zeiten = []
         gesamtzahl = 0 
 
@@ -110,17 +106,19 @@ class MainWindow(QMainWindow):
                 zeit = verkehr[0]
                 yein = int(verkehr[1].strip().replace("->", ""))
                 yaus = int(verkehr[2].strip().replace("<-", ""))
+                yanz = int(verkehr[3].strip().replace("$",""))
                 
                 # Zeit, Ein- und Ausgänge zu den jeweiligen Listen hinzufügen
                 zeiten.append(zeit)
                 yeinDaten.append(yein)
                 yausDaten.append(yaus)
+                yanzMäuser.append(yanz)
         
         last_line = daten[-1].split(",")
         if len(last_line) >= 4: 
             gesamtzahl = int(last_line[3].strip().replace("$",""))
         # Rückgabe der Listen
-        return yeinDaten, yausDaten, zeiten, gesamtzahl
+        return yeinDaten, yausDaten, zeiten,yanzMäuser, gesamtzahl
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

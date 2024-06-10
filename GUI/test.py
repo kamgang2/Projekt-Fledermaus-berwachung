@@ -1,7 +1,9 @@
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+ 
 def plot_data(daten):
     yeinDaten = []
     yausDaten = []
@@ -67,3 +69,62 @@ def data_lesen():
 # Beispielaufruf der Funktion mit Daten aus der Datei
 data = data_lesen()
 plot_data(data)
+"""
+
+from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout
+from PySide6.QtGui import QPainter, QPen
+from PySide6.QtCore import Qt, QRect, QTimer
+import sys
+
+class CircularProgress(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.value = 0
+        self.setMinimumSize(200, 200)
+
+    def setValue(self, value):
+        self.value = value
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        rect = QRect(10, 10, self.width() - 20, self.height() - 20)
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        # Hintergrundkreis
+        pen = QPen(Qt.gray, 10)
+        painter.setPen(pen)
+        painter.drawEllipse(rect)
+
+        # Fortschrittskreis
+        pen.setColor(Qt.blue)
+        painter.setPen(pen)
+        painter.drawArc(rect, 90 * 16, -self.value * 16 * 3.6)
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.progress = CircularProgress()
+        
+        layout = QVBoxLayout()
+        layout.addWidget(self.progress)
+        self.setLayout(layout)
+
+        # Timer für die Aktualisierung des Fortschritts
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_progress)
+        self.timer.start(100)
+
+        self.progress_value = 0
+
+    def update_progress(self):
+        self.progress_value += 1
+        if self.progress_value > 100:
+            self.progress_value = 0
+        self.progress.setValue(self.progress_value)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())

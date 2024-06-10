@@ -16,7 +16,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGraphicsView, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QWidget, QVBoxLayout, QPushButton, QLCDNumber, QGridLayout, QLabel)
+    QSizePolicy, QStatusBar, QWidget, QVBoxLayout, QPushButton, QLCDNumber, QGridLayout, QLabel, QProgressBar)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -38,6 +38,13 @@ class Ui_MainWindow(object):
         self.lcdTemp.setObjectName(u"lcdTemp")
         self.lcdTemp.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout.addWidget(self.lcdTemp, 0, 11, 2, 2)
+        lcdTempHeight = getHight(self.lcdTemp)
+        
+        # self.TempProgressBar = QProgressBar()
+        # self.TempProgressBar.setObjectName(u"TempProgessBar")
+        # self.TempProgressBar.setOrientation(Qt.Vertical)
+        # self.TempProgressBar.setMaximumHeight(20)
+        # self.layout.addWidget(self.TempProgressBar,0,14)
 
         self.TempLabel = QLabel("Temperature in °C")
         self.TempLabel.setObjectName(u"TempLabel")
@@ -75,5 +82,8 @@ class Ui_MainWindow(object):
     
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+ 
 
-
+   
+def getHight(element):
+    return element.height()
