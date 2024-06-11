@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 
+
 // PIN Definition DHT22 Sensoren
 #define DHTTYPE DHT22
 DHT dht1(2,DHT22);
