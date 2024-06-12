@@ -100,10 +100,18 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(u"menubar")
         MainWindow.setMenuBar(self.menubar)
         self.menuDatei = QMenu(self.menubar)
+
         self.menuDatei.setObjectName(u"menuDatei")
+        self.menuDatei.addAction("als Excel exportieren")
         self.menuAnsicht = QMenu(self.menubar)
+
         self.menuAnsicht.setObjectName(u"menuAnsicht")
+        self.menuAnsicht.addAction("Tag")
+        self.menuAnsicht.addAction("Wochen")
+        self.menuAnsicht.addAction("Monat")
+
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
