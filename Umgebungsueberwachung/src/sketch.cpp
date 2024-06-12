@@ -131,7 +131,7 @@ void loop() {
   Serial.print(h_ges);
   Serial.print(F("%,"));
   Serial.print(t_ges);
-  Serial.println(F("°C "));
+  Serial.println(F("C "));
 
   // TFT Ausgabe
   TFTScreen.fillScreen(ST77XX_BLACK);

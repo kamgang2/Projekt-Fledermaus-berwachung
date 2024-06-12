@@ -55,7 +55,7 @@ class Ui_MainWindow(object):
         # Temperatur Fortschrittsbalken
         self.TempProgessBar = QProgressBar(self.centralwidget)
         self.TempProgessBar.setObjectName(u"TempProgessBar")
-        self.TempProgessBar.setValue(24)
+        self.TempProgessBar.setRange(-20, 50)
         self.TempProgessBar.setOrientation(Qt.Vertical)
         self.gridLayout.addWidget(self.TempProgessBar, 0, 2, 3, 1)
 

@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
             self.data = self.data_lesen()
             if not self.data:
                 return
-            self.yeinDaten, self.yausDaten, self.zeiten,self.yanzMäuser, gesamtzahl = self.process_data(self.data)
+            self.yeinDaten, self.yausDaten, self.zeiten,self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp  = self.process_data(self.data)
 
         # Größe der QGraphicsView abfragen
         view_size = self.ui.graphicsView.size()
@@ -74,6 +74,23 @@ class MainWindow(QMainWindow):
         # Gesamtzahl 
         self.ui.lcdGesamtzahl.display(gesamtzahl)
 
+        #Temperature
+        self.ui.lcdTemp.display(Temp)
+        self.ui.TempProgessBar.setValue(Temp)
+        if Temp < -5:
+            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: blue; }")
+        elif -5 <= Temp < 5:
+            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: lightblue; }")
+        elif 5 <= Temp < 25:
+            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: green; }")
+        elif 25 <= Temp < 35:
+            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: yellow; }")
+        else:
+            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: red; }")
+        
+        #Luftfeuchtigkeit
+        self.ui.lcdLuft.display(LuftFeuchtigkeit)
+
     def data_lesen(self):
         # Öffnen der Datei im Lesemodus
         try:
@@ -98,10 +115,12 @@ class MainWindow(QMainWindow):
         yanzMäuser = []
         zeiten = []
         gesamtzahl = 0 
+        Temp = 0 
+        LuftFeuchtigkeit = 0 
 
         for line in daten:
             verkehr = line.split(",")
-            if len(verkehr) >= 4:
+            if len(verkehr) >= 6:
                 # Extrahiert die Zeit und die Ein- und Ausgänge
                 zeit = verkehr[0]
                 yein = int(verkehr[1].strip().replace("->", ""))
@@ -115,10 +134,12 @@ class MainWindow(QMainWindow):
                 yanzMäuser.append(yanz)
         
         last_line = daten[-1].split(",")
-        if len(last_line) >= 4: 
+        if len(last_line) >= 6: 
             gesamtzahl = int(last_line[3].strip().replace("$",""))
+            LuftFeuchtigkeit = float(verkehr[4].strip().replace("%",""))
+            Temp = float(verkehr[5].strip().replace("C",""))
         # Rückgabe der Listen
-        return yeinDaten, yausDaten, zeiten,yanzMäuser, gesamtzahl
+        return yeinDaten, yausDaten, zeiten,yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

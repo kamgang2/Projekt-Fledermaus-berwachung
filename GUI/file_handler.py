@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Configure the serial port and the baud rate
-serial_port1 = 'COM3'  # Replace with your serial port
+serial_port1 = 'COM4'  # Replace with your serial port
 serial_port2 = 'COM5'
 baud_rate = 9600
 output_file = 'serial_data.txt'
@@ -32,7 +32,7 @@ with open(output_file, 'a') as file:
         while True:
             if ser1.in_waiting > 0 : 
                 # Read a line from the serial port
-                line1 = ser1.readline().decode('utf-8').strip() 
+                data1 = ser1.readline().decode('utf-8').strip() 
                 print(f"Received from {serial_port1}: {data1}")
                 ##timestamp = datetime.datetime.now()
                 # Print the line to the console
@@ -50,7 +50,7 @@ with open(output_file, 'a') as file:
                 myDataLine = f"{timestamp},{data1},{data2}"
                 print(f"Writing to file: {myDataLine}")
                 file.write(myDataLine + '\n')
-                
+                file.flush()  # Ensure the data is written to the file immediately
                 # Reset the data after writing
                 data1 = None
                 data2 = None
@@ -66,10 +66,4 @@ with open(output_file, 'a') as file:
     finally:
         ser1.close()
         ser2.close()
-        print(f"Disconnected from {serial_port1} and {serial_port2}.")
-
-
-
-
-
-    
+        print(f"Disconnected from {serial_port1} and {serial_port2}.")   
