@@ -70,7 +70,7 @@ def data_lesen():
 data = data_lesen()
 plot_data(data)
 """
-
+"""
 from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout
 from PySide6.QtGui import QPainter, QPen
 from PySide6.QtCore import Qt, QRect, QTimer
@@ -128,3 +128,62 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+"""   
+
+# grouped_xmos = {}
+
+# for file in filtered_files:
+#     xmos_names = file['filename']
+#     xmos_name = xmos_names[3]
+#     key = f"{xmos_name}"
+    
+#     if key not in grouped_xmos:
+#         grouped_xmos[key] = []
+    
+#     grouped_xmos[key].append(file)
+
+
+
+
+def timescaling(scalefactor): 
+    try:
+        with open("serial_data.txt", "r") as myfile: 
+            lines = []
+            groupedDate = {}
+
+            for line in myfile:     
+                lines.append(line.strip().split(","))
+
+            for item in lines: 
+                    date = item[0].split(" ")[0]
+                    item[0] = date
+            
+            if(scalefactor== "month"): 
+                for el in lines: 
+                    key = el[0].split("-")[1]
+
+                    if key not in groupedDate: 
+                        groupedDate[key] = []
+                    groupedDate[key].append(el)
+
+            if(scalefactor == "day"):
+                for el in lines: 
+                    key =  el[0].split("-")[0]+ "-" + el[0].split("-")[1]
+                    if key not in groupedDate: 
+                        groupedDate[key]=[]
+                    groupedDate[key].append(el)
+
+            for key, group in groupedDate.items(): 
+                    print(f"Group {key}:")
+                    for item in group:
+                        print(item)
+
+    except FileNotFoundError:
+        print("File not found: 'serial_data.txt'")
+
+# Call the function to execute it
+timescaling("day")
+
+
+  
+
