@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  # Assuming this is your UI file
 from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data
 import sys
@@ -23,6 +23,32 @@ class MainWindow(QMainWindow):
         self.yausDaten = None
         self.zeiten = None
 
+        # Create QActionGroup for mutually exclusive actions
+        self.scaleActionGroup = QActionGroup(self)
+        self.scaleActionGroup.setExclusive(True)
+
+        # Make actions checkable
+        self.ui.actionNormal.setCheckable(True)
+        self.ui.actionTag.setCheckable(True)
+        self.ui.actionMonat.setCheckable(True)
+
+        # Add actions to the group
+        self.scaleActionGroup.addAction(self.ui.actionNormal)
+        self.scaleActionGroup.addAction(self.ui.actionTag)
+        self.scaleActionGroup.addAction(self.ui.actionMonat)
+
+        # Set the default checked action
+        self.ui.actionNormal.setChecked(True)
+    
+    def get_action_checked(self):
+        if self.ui.actionNormal.isChecked():
+            return scalefactor.Normal
+        if self.ui.actionTag.isChecked():
+            return scalefactor.Day
+        if self.ui.actionMonat.isChecked():
+            return scalefactor.Month
+
+
     def resizeEvent(self, event):
         super(MainWindow, self).resizeEvent(event)
         # Redraw plot when window size changes
@@ -35,7 +61,7 @@ class MainWindow(QMainWindow):
             self.data = data_lesen()
             if not self.data:
                 return
-            self.zeiten, self.yeinDaten, self.yausDaten,  self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, scalefactor.Month)
+            self.zeiten, self.yeinDaten, self.yausDaten,  self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
 
         # Get size of QGraphicsView
         view_size = self.ui.graphicsView.size()
