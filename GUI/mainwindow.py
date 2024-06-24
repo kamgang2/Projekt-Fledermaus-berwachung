@@ -18,7 +18,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QGraphicsView, QLCDNumber, QLabel,
     QMainWindow, QMenu, QMenuBar, QProgressBar,
-    QPushButton, QSizePolicy, QStatusBar, QWidget, QGridLayout)
+    QPushButton, QSizePolicy, QStatusBar, QWidget, QGridLayout, QScrollArea)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -102,13 +102,20 @@ class Ui_MainWindow(object):
         self.menuDatei = QMenu(self.menubar)
 
         self.menuDatei.setObjectName(u"menuDatei")
-        self.menuDatei.addAction("als Excel exportieren")
+        self.actionExportExcel = QAction("als Excel exportieren", MainWindow)
+        self.menuDatei.addAction(self.actionExportExcel)
         self.menuAnsicht = QMenu(self.menubar)
 
         self.menuAnsicht.setObjectName(u"menuAnsicht")
-        self.menuAnsicht.addAction("Tag")
-        self.menuAnsicht.addAction("Wochen")
-        self.menuAnsicht.addAction("Monat")
+        self.actionTag = QAction("Tag", MainWindow)
+        self.actionNormal = QAction("Normal", MainWindow)
+        # self.actionWochen = QAction("Wochen", MainWindow)
+        self.actionMonat = QAction("Monat", MainWindow)
+        self.menuAnsicht.addAction(self.actionNormal)
+        self.menuAnsicht.addAction(self.actionTag)
+        # self.menuAnsicht.addAction(self.actionWochen)
+        self.menuAnsicht.addAction(self.actionMonat)
+     
 
         MainWindow.setMenuBar(self.menubar)
 

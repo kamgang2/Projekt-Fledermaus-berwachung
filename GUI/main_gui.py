@@ -1,29 +1,23 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber
 from PySide6.QtGui import QPixmap
-from PySide6 import QtGui
-from mainwindow import Ui_MainWindow
-import sys 
-import numpy as np 
-import matplotlib.pyplot as plt 
-
+from mainwindow import Ui_MainWindow  # Assuming this is your UI file
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        # Verknüpfen des Plot-Buttons mit der plot_data Methode
-        self.ui.plotButton.clicked.connect(self.plot_data)
-       
-        # Setze die Textfarbe des QLCDNumber-Widgets
-        self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
-       
-        # self.ui.lcdGesamtzahl.display(0)  # Initialisiere das Display mit 0
-        # palette = self.ui.lcdGesamtzahl.palette()
-        # palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor("skyblue"))  # Ändere die Textfarbe auf Rot
-        # self.ui.lcdGesamtzahl.setPalette(palette)
         
+        # Connect plot button with plot_data method
+        self.ui.plotButton.clicked.connect(self.plot_data)
+
+        # Set segment style of QLCDNumber widget
+        self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
+
         self.data = None
         self.yeinDaten = None
         self.yausDaten = None
@@ -31,50 +25,50 @@ class MainWindow(QMainWindow):
 
     def resizeEvent(self, event):
         super(MainWindow, self).resizeEvent(event)
-        # Plot neu zeichnen, wenn die Fenstergröße geändert wird
+        # Redraw plot when window size changes
         if self.data is not None:
             self.plot_data()
 
     def plot_data(self):
-        # Daten nur einmal einlesen
+        # Read data only once
         if self.data is None:
-            self.data = self.data_lesen()
+            self.data = data_lesen()
             if not self.data:
                 return
-            self.yeinDaten, self.yausDaten, self.zeiten,self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp  = self.process_data(self.data)
+            self.zeiten, self.yeinDaten, self.yausDaten,  self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, scalefactor.Month)
 
-        # Größe der QGraphicsView abfragen
+        # Get size of QGraphicsView
         view_size = self.ui.graphicsView.size()
         width, height = view_size.width(), view_size.height()
 
-        # Plotten der Daten mit Matplotlib und dynamische Anpassung der Größe
-        fig, ax = plt.subplots(figsize=(width /90 , height/ 90 ))
+        # Plot data with Matplotlib and dynamically adjust size
+        fig, ax = plt.subplots(figsize=(width / 90, height / 90))
         ax.plot(self.zeiten, self.yeinDaten, label='Einfluege', color='green')
-        ax.plot(self.zeiten, self.yausDaten, label='Ausfluege', color= 'red')
-        ax.plot(self.zeiten, self.yanzMäuser, label = 'Anz Fledermausern', color = 'skyblue' )
+        ax.plot(self.zeiten, self.yausDaten, label='Ausfluege', color='red')
+        ax.plot(self.zeiten, self.yanzMäuser, label='Anz Fledermausern', color='skyblue')
         ax.set_xlabel('Zeit')
         ax.set_ylabel('Werte')
         ax.set_title('Ein- und Aus-Fluege über die Zeit')
         ax.legend()
-        
-        # Speichern des Plots in ein Bild
+
+        # Save plot to an image
         plt.savefig("plot.png", bbox_inches='tight', pad_inches=0)
         plt.close(fig)
-        
-        # Bild in QPixmap laden
+
+        # Load image into QPixmap
         pixmap = QPixmap("plot.png")
-        
-        # Erstellen einer QGraphicsScene und Hinzufügen des Bildes
+
+        # Create a QGraphicsScene and add the image
         scene = QGraphicsScene()
         scene.addPixmap(pixmap)
-        
-        # Anzeigen der Szene in der QGraphicsView
+
+        # Display the scene in the QGraphicsView
         self.ui.graphicsView.setScene(scene)
 
-        # Gesamtzahl 
+        # Display total count
         self.ui.lcdGesamtzahl.display(gesamtzahl)
 
-        #Temperature
+        # Display temperature
         self.ui.lcdTemp.display(Temp)
         self.ui.TempProgessBar.setValue(Temp)
         if Temp < -5:
@@ -87,62 +81,65 @@ class MainWindow(QMainWindow):
             self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: yellow; }")
         else:
             self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: red; }")
-        
-        #Luftfeuchtigkeit
+
+        # Display humidity
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
 
-    def data_lesen(self):
-        # Öffnen der Datei im Lesemodus
-        try:
-            with open("serial_data.txt", "r") as myfile:
-                # Initialisieren einer leeren Liste, um die Zeilen zu speichern
-                lines = []
-                
-                # Durchlaufen jeder Zeile in der Datei
-                for line in myfile:
-                    # Entfernen des Zeilenumbruchs und Hinzufügen zur Liste
-                    lines.append(line.strip())
-                
-                # Rückgabe der Liste mit den Zeilen
-                return lines
-        except FileNotFoundError:
-            print("Datei 'serial_data.txt' nicht gefunden.")
-            return []
-
-    def process_data(self, daten):
+    def process_data(self, data, sc_factor: scalefactor):
         yeinDaten = []
         yausDaten = []
         yanzMäuser = []
         zeiten = []
-        gesamtzahl = 0 
-        Temp = 0 
-        LuftFeuchtigkeit = 0 
+        gesamtzahl = 0
+        Temp = 0
+        LuftFeuchtigkeit = 0
 
-        for line in daten:
-            verkehr = line.split(",")
-            if len(verkehr) >= 6:
-                # Extrahiert die Zeit und die Ein- und Ausgänge
-                zeit = verkehr[0]
-                yein = int(verkehr[1].strip().replace("->", ""))
-                yaus = int(verkehr[2].strip().replace("<-", ""))
-                yanz = int(verkehr[3].strip().replace("$",""))
-                
-                # Zeit, Ein- und Ausgänge zu den jeweiligen Listen hinzufügen
-                zeiten.append(zeit)
-                yeinDaten.append(yein)
-                yausDaten.append(yaus)
-                yanzMäuser.append(yanz)
+        daten = timescaling(data, sc_factor)
+        if not daten:
+            return  zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl
         
-        last_line = daten[-1].split(",")
-        if len(last_line) >= 6: 
-            gesamtzahl = int(last_line[3].strip().replace("$",""))
-            LuftFeuchtigkeit = float(verkehr[4].strip().replace("%",""))
-            Temp = float(verkehr[5].strip().replace("C",""))
-        # Rückgabe der Listen
-        return yeinDaten, yausDaten, zeiten,yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
+
+        # Sort dates to get the most recent one
+        sorted_dates = sorted(daten.keys())
+        most_recent_date = sorted_dates[-1]
+        last_values = daten[most_recent_date]
+        
+        the_last_value = last_values[-1]
+        gesamtzahl = int(the_last_value[3].strip().replace("$",""))
+        LuftFeuchtigkeit = float(the_last_value[4].strip().replace("%",""))
+        Temp = float(the_last_value[5].strip().replace("C","") )
+
+        # if len(last_values) >= 4:
+        #     gesamtzahl = int(last_values[3].strip().replace("$", ""))
+        # if len(last_values) >= 6:
+        #     LuftFeuchtigkeit = float(last_values[4].strip().replace("%", ""))
+        #     Temp = float(last_values[5].strip().replace("C", ""))
+        match sc_factor:
+            case scalefactor.Normal:
+                for line in daten:
+                    verkehr = line.split(",")
+                    if len(verkehr) >= 6:
+                        zeit = verkehr[0]
+                        yein = int(verkehr[1].strip().replace("->", ""))
+                        yaus = int(verkehr[2].strip().replace("<-", ""))
+                        yanz = int(verkehr[3].strip().replace("$", ""))
+
+                        zeiten.append(zeit)
+                        yeinDaten.append(yein)
+                        yausDaten.append(yaus)
+                        yanzMäuser.append(yanz)
+
+            case scalefactor.Day | scalefactor.Month:
+                zeiten, yeinDaten, yausDaten, yanzMäuser = process_average_data(daten)
+
+            case _:
+                return [], [], [], [], 0, 0, 0
+
+        return  zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+

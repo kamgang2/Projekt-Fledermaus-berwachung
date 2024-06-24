@@ -156,7 +156,7 @@ def timescaling(scalefactor):
 
             for item in lines: 
                     date = item[0].split(" ")[0]
-                    item[0] = date
+                    item[0] = date 
             
             if(scalefactor== "month"): 
                 for el in lines: 
@@ -173,17 +173,67 @@ def timescaling(scalefactor):
                         groupedDate[key]=[]
                     groupedDate[key].append(el)
 
-            for key, group in groupedDate.items(): 
-                    print(f"Group {key}:")
-                    for item in group:
-                        print(item)
+            # for key, group in groupedDate.items(): 
+            #         print(f"Group {key}:")
+            #         for item in group:
+            #             print (item)
+            return groupedDate
 
     except FileNotFoundError:
         print("File not found: 'serial_data.txt'")
 
 # Call the function to execute it
-timescaling("day")
 
-
+# data = timescaling("day")
+# for key, group in data.items():
+#     print(f"Group {key}:")
+#     for item in group:          
+#         print (item)
   
 
+def getAverage(data, whichValue):
+    averages = {}
+    
+    for key, group in data.items():
+        total_value = 0
+        count = 0
+        
+        for item in group:
+            if whichValue == "ein":
+                value = int(item[1].replace("->", "").strip())
+                total_value += value
+                count += 1
+
+            if whichValue == "aus":
+                value = int(item[2].replace("<-","").strip())
+                total_value += value
+                count += 1
+
+            if whichValue == "sum":
+                value = int(item[3].replace("$","").strip())
+                total_value += value
+                count += 1
+            
+            if whichValue == "hydr":
+                value = int(item[4].replace("%","").strip())
+                total_value += value
+                count += 1
+
+            if whichValue == "temp":
+                value = int(item[5].replace("C","").strip())
+                total_value += value
+                count += 1
+
+        if count > 0:
+            average_value = total_value / count
+            averages[key] = average_value
+        else:
+            averages[key] = 0
+
+    return averages
+
+
+data = timescaling("day")
+averages = getAverage(data, "ein")
+for key, average in averages.items():
+    print(f"Gruppe: {key}, Durchschnittswert: {average}")
