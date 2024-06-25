@@ -69,17 +69,27 @@ class MainWindow(QMainWindow):
         view_size = self.ui.graphicsView.size()
         width, height = view_size.width(), view_size.height()
 
+        # Ensure at least min_x_distance between neighboring points
+        x = np.array(self.zeiten)
+        y1 = np.array(self.yeinDaten)
+        y2 = np.array(self.yausDaten)
+        y3 = np.array(self.yanzMäuser)
+
         # Plot data with Matplotlib and dynamically adjust size
         fig, ax = plt.subplots(figsize=(width / 90, height / 90))
-        ax.plot(self.zeiten, self.yeinDaten, label='Einfluege', color='green')
-        ax.plot(self.zeiten, self.yausDaten, label='Ausfluege', color='red')
-        ax.plot(self.zeiten, self.yanzMäuser, label='Anz Fledermausern', color='skyblue')
+        ax.plot(x, y1, label='Einfluege', color='green')
+        ax.plot(x, y2, label='Ausfluege', color='red')
+        ax.plot(x, y3, label='Anz Fledermausern', color='skyblue')
         ax.set_xlabel('Zeit')
         ax.set_ylabel('Werte')
         ax.set_title('Ein- und Aus-Fluege über die Zeit')
         ax.legend()
 
-        # Save plot to an image
+        # Set custom x ticks to ensure minimum distance
+        min_x_distance = 2.0  # Adjust this value as needed
+        ax.set_xticks(x[::int(min_x_distance)])  # Adjust interval based on min_x_distance
+
+        plt.tight_layout()  # Adjust layout to prevent clipping of labels
         plt.savefig("plot.png", bbox_inches='tight', pad_inches=0)
         plt.close(fig)
 
