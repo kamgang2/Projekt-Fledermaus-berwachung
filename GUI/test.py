@@ -239,6 +239,53 @@ for key, average in averages.items():
     print(f"Gruppe: {key}, Durchschnittswert: {average}")
 
     """
-
+"""
 import pyqtgraph.examples
 pyqtgraph.examples.run()
+"""
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QSpinBox, QLabel
+import sys
+
+class SpinBoxApp(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('SpinBox Example')
+        self.setGeometry(100, 100, 300, 200)
+
+        self.layout = QVBoxLayout()
+
+        self.button = QPushButton('Show SpinBox')
+        self.button.clicked.connect(self.show_spinbox)
+
+        self.spinbox = QSpinBox()
+        self.spinbox.setMinimum(0)
+        self.spinbox.setMaximum(100)
+        self.spinbox.setVisible(False)
+
+        self.get_value_button = QPushButton('Get SpinBox Value')
+        self.get_value_button.clicked.connect(self.get_spinbox_value)
+        self.get_value_button.setVisible(False)
+
+        self.value_label = QLabel('')
+
+        self.layout.addWidget(self.button)
+        self.layout.addWidget(self.spinbox)
+        self.layout.addWidget(self.get_value_button)
+        self.layout.addWidget(self.value_label)
+
+        self.setLayout(self.layout)
+
+    def show_spinbox(self):
+        self.spinbox.setVisible(True)
+        self.get_value_button.setVisible(True)
+
+    def get_spinbox_value(self):
+        value = self.spinbox.value()
+        self.value_label.setText(f'SpinBox Value: {value}')
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = SpinBoxApp()
+    window.show()
+    sys.exit(app.exec())

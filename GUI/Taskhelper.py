@@ -1,6 +1,7 @@
 from enum import Enum
 from datetime import datetime
 
+
 class scalefactor(Enum): 
     Normal =1 
     Day = 2
@@ -159,4 +160,10 @@ def convert_to_datetime(value):
             except ValueError:
                 # Wenn beide Versuche fehlschlagen, den Wert als Text beibehalten
                 return value
-            
+
+
+
+def set_anz_fledermaeusen():
+    spinbox = QAbstractSpinBox()
+    spinbox.setVisible(True)
+    

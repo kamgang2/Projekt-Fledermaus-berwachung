@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber
+from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber, QSpinBox
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  # Assuming this is your UI file
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, set_anz_fledermaeusen
 import sys
 import numpy as np
 import pyqtgraph as pg
@@ -38,6 +38,9 @@ class MainWindow(QMainWindow):
         self.LuftFeuchtigkeit = 0
         self.Temp = 0
 
+        self.spinbox = QSpinBox()
+        self.spinbox.setVisible(False)
+
         # Create QActionGroup for mutually exclusive actions
         self.scaleActionGroup = QActionGroup(self)
         self.scaleActionGroup.setExclusive(True)
@@ -55,8 +58,13 @@ class MainWindow(QMainWindow):
         # Set the default checked action
         self.ui.actionNormal.setChecked(True)
 
+        self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox())
+
         # Connect plot button with plot_data method
         self.ui.plotButton.clicked.connect(self.plot_data)
+
+    def show_spinbox(self):
+        self.spinbox.setVisible(True)
     
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():

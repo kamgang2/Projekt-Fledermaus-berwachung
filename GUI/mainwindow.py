@@ -17,7 +17,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QGraphicsView, QLCDNumber, QLabel,
-    QMainWindow, QMenu, QMenuBar, QProgressBar,
+    QMainWindow, QMenu, QMenuBar, QProgressBar, QSpinBox,
     QPushButton, QSizePolicy, QStatusBar, QWidget, QGridLayout, QScrollArea)
 import pyqtgraph as pg
 
@@ -116,6 +116,10 @@ class Ui_MainWindow(object):
         self.menuAnsicht.addAction(self.actionTag)
         # self.menuAnsicht.addAction(self.actionWochen)
         self.menuAnsicht.addAction(self.actionMonat)
+
+        self.menuEinstellung = QMenu(u"Eintsellung")
+        self.actionSetAnzFledermause = QAction("Set Anz der Fledermause", MainWindow)
+        self.menuEinstellung.addAction(self.actionSetAnzFledermause)
      
 
         MainWindow.setMenuBar(self.menubar)
@@ -126,6 +130,7 @@ class Ui_MainWindow(object):
 
         self.menubar.addAction(self.menuDatei.menuAction())
         self.menubar.addAction(self.menuAnsicht.menuAction())
+        self.menubar.addAction(self.menuEinstellung.menuAction())
 
         self.retranslateUi(MainWindow)
 
