@@ -143,7 +143,7 @@ if __name__ == "__main__":
 #     grouped_xmos[key].append(file)
 
 
-
+"""
 
 def timescaling(scalefactor): 
     try:
@@ -237,3 +237,8 @@ data = timescaling("day")
 averages = getAverage(data, "ein")
 for key, average in averages.items():
     print(f"Gruppe: {key}, Durchschnittswert: {average}")
+
+    """
+
+import pyqtgraph.examples
+pyqtgraph.examples.run()

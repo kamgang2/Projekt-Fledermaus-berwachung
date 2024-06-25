@@ -19,6 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QGraphicsView, QLCDNumber, QLabel,
     QMainWindow, QMenu, QMenuBar, QProgressBar,
     QPushButton, QSizePolicy, QStatusBar, QWidget, QGridLayout, QScrollArea)
+import pyqtgraph as pg
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -33,9 +34,9 @@ class Ui_MainWindow(object):
         self.gridLayout = QGridLayout(self.centralwidget)
         
         # Grafikansicht
-        self.graphicsView = QGraphicsView(self.centralwidget)
-        self.graphicsView.setObjectName(u"graphicsView")
-        self.gridLayout.addWidget(self.graphicsView, 0, 0, 17, 1)
+        self.plotWidget = pg.PlotWidget(self.centralwidget)
+        self.plotWidget.setObjectName(u"plotWidget")
+        self.gridLayout.addWidget(self.plotWidget, 0, 0, 17, 1)
         
         # Temperatur LCD
         self.lcdTemp = QLCDNumber(self.centralwidget)

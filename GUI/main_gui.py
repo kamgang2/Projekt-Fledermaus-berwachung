@@ -1,16 +1,31 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  # Assuming this is your UI file
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+import pyqtgraph as pg
+from PySide6.QtCore import Qt
+import matplotlib.dates as mdates  # Import date2num from matplotlib
+
+class CustomAxisItem(pg.AxisItem):
+    def __init__(self, labels=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.labels = labels if labels is not None else {}
+
+    def tickStrings(self, values, scale, spacing):
+        strings = []
+        for v in values:
+            v_str = self.labels.get(v, "")
+            strings.append(v_str)
+        return strings
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.plotWidget.setBackground('w')
 
         # Set segment style of QLCDNumber widget
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
@@ -22,7 +37,6 @@ class MainWindow(QMainWindow):
         self.gesamtzahl = 0
         self.LuftFeuchtigkeit = 0
         self.Temp = 0
-
 
         # Create QActionGroup for mutually exclusive actions
         self.scaleActionGroup = QActionGroup(self)
@@ -51,7 +65,6 @@ class MainWindow(QMainWindow):
             return scalefactor.Day
         if self.ui.actionMonat.isChecked():
             return scalefactor.Month
-  
 
     def resizeEvent(self, event):
         super(MainWindow, self).resizeEvent(event)
@@ -63,45 +76,38 @@ class MainWindow(QMainWindow):
         self.data = data_lesen()
         if not self.data:
             return
-        self.zeiten, self.yeinDaten, self.yausDaten,  self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
+        self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
+        
+        # Convert times to datetime
+        self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
+        
+        # Create a mapping from time to index for custom axis labels
+        time_to_index = {t: i for i, t in enumerate(self.zeiten)}
+        indices = [time_to_index[t] for t in self.zeiten]
+        
+        self.ui.plotWidget.clear()
+        self.ui.plotWidget.addLegend()
+        
+        # Define pens with different thickness
+        pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
+        pen_aus = {'color': 'r', 'width': 3}  # Thickness for 'Ausfluege'
+        pen_anz = {'color': 'b', 'width': 3}  # Thickness for 'Anz Fledermaeuser'
 
-        # Get size of QGraphicsView
-        view_size = self.ui.graphicsView.size()
-        width, height = view_size.width(), view_size.height()
+        self.ui.plotWidget.plot(indices, self.yeinDaten, pen= pen_ein, name='Einfluege')
+        self.ui.plotWidget.plot(indices, self.yausDaten, pen= pen_aus, name='Ausfluege')
+        self.ui.plotWidget.plot(indices, self.yanzMäuser, pen= pen_anz, name='Anz Fledermaeuser')
 
-        # Ensure at least min_x_distance between neighboring points
-        x = np.array(self.zeiten)
-        y1 = np.array(self.yeinDaten)
-        y2 = np.array(self.yausDaten)
-        y3 = np.array(self.yanzMäuser)
+        # Set labels and title
+        self.ui.plotWidget.setLabel('left', 'Werte')
+        self.ui.plotWidget.setLabel('bottom', 'Zeit')
+        self.ui.plotWidget.setTitle('Ein- und Aus-Fluege über die Zeit')
 
-        # Plot data with Matplotlib and dynamically adjust size
-        fig, ax = plt.subplots(figsize=(width / 90, height / 90))
-        ax.plot(x, y1, label='Einfluege', color='green')
-        ax.plot(x, y2, label='Ausfluege', color='red')
-        ax.plot(x, y3, label='Anz Fledermausern', color='skyblue')
-        ax.set_xlabel('Zeit')
-        ax.set_ylabel('Werte')
-        ax.set_title('Ein- und Aus-Fluege über die Zeit')
-        ax.legend()
+        # Use CustomAxisItem to correctly display custom labels on the x-axis
+        date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
+        custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
+        self.ui.plotWidget.setAxisItems({'bottom': custom_axis})
 
-        # Set custom x ticks to ensure minimum distance
-        min_x_distance = 2.0  # Adjust this value as needed
-        ax.set_xticks(x[::int(min_x_distance)])  # Adjust interval based on min_x_distance
-
-        plt.tight_layout()  # Adjust layout to prevent clipping of labels
-        plt.savefig("plot.png", bbox_inches='tight', pad_inches=0)
-        plt.close(fig)
-
-        # Load image into QPixmap
-        pixmap = QPixmap("plot.png")
-
-        # Create a QGraphicsScene and add the image
-        scene = QGraphicsScene()
-        scene.addPixmap(pixmap)
-
-        # Display the scene in the QGraphicsView
-        self.ui.graphicsView.setScene(scene)
+       
 
         # Display total count
         self.ui.lcdGesamtzahl.display(gesamtzahl)
@@ -134,22 +140,15 @@ class MainWindow(QMainWindow):
 
         daten = timescaling(data, sc_factor)
         if not daten:
-            return  zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl
-        
+            return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl
 
-      
-        # if len(last_values) >= 4:
-        #     gesamtzahl = int(last_values[3].strip().replace("$", ""))
-        # if len(last_values) >= 6:
-        #     LuftFeuchtigkeit = float(last_values[4].strip().replace("%", ""))
-        #     Temp = float(last_values[5].strip().replace("C", ""))
         match sc_factor:
             case scalefactor.Normal:
                 last_line = daten[-1].split(",")
                 if len(last_line) >= 6:
-                    gesamtzahl = int(last_line[3].strip().replace("$",""))
-                    LuftFeuchtigkeit = float(last_line[4].strip().replace("%",""))
-                    Temp = float(last_line[5].strip().replace("C",""))
+                    gesamtzahl = int(last_line[3].strip().replace("$", ""))
+                    LuftFeuchtigkeit = float(last_line[4].strip().replace("%", ""))
+                    Temp = float(last_line[5].strip().replace("C", ""))
                 for line in daten:
                     verkehr = line.split(",")
                     if len(verkehr) >= 6:
@@ -172,19 +171,18 @@ class MainWindow(QMainWindow):
                 last_values = daten[most_recent_date]
                 
                 the_last_value = last_values[-1]
-                gesamtzahl = int(the_last_value[3].strip().replace("$",""))
-                LuftFeuchtigkeit = float(the_last_value[4].strip().replace("%",""))
-                Temp = float(the_last_value[5].strip().replace("C","") )
-
+                gesamtzahl = int(the_last_value[3].strip().replace("$", ""))
+                LuftFeuchtigkeit = float(the_last_value[4].strip().replace("%", ""))
+                Temp = float(the_last_value[5].strip().replace("C", ""))
 
             case _:
                 return [], [], [], [], 0, 0, 0
 
-        return  zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
+        return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
-

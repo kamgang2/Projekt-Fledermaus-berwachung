@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 
 class scalefactor(Enum): 
     Normal =1 
@@ -145,3 +146,17 @@ def process_average_data(daten):
         yanzMäuser.append(averageSum.get(key, 0))
     
     return zeiten, yeinDaten, yausDaten, yanzMäuser
+
+
+def convert_to_datetime(value):
+        try:
+            # Versuchen, den Wert in ein datetime-Objekt umzuwandeln
+            return datetime.strptime(value, '%d-%m-%Y %H:%M:%S')
+        except ValueError:
+            try:
+                # Versuchen, den Wert in ein Datum ohne Uhrzeit umzuwandeln
+                return datetime.strptime(value, '%d-%m-%Y').date()
+            except ValueError:
+                # Wenn beide Versuche fehlschlagen, den Wert als Text beibehalten
+                return value
+            
