@@ -11,9 +11,6 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
-        # Connect plot button with plot_data method
-        self.ui.plotButton.clicked.connect(self.plot_data)
 
         # Set segment style of QLCDNumber widget
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
@@ -22,6 +19,10 @@ class MainWindow(QMainWindow):
         self.yeinDaten = None
         self.yausDaten = None
         self.zeiten = None
+        self.gesamtzahl = 0
+        self.LuftFeuchtigkeit = 0
+        self.Temp = 0
+
 
         # Create QActionGroup for mutually exclusive actions
         self.scaleActionGroup = QActionGroup(self)
@@ -39,6 +40,9 @@ class MainWindow(QMainWindow):
 
         # Set the default checked action
         self.ui.actionNormal.setChecked(True)
+
+        # Connect plot button with plot_data method
+        self.ui.plotButton.clicked.connect(self.plot_data)
     
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():
@@ -47,7 +51,7 @@ class MainWindow(QMainWindow):
             return scalefactor.Day
         if self.ui.actionMonat.isChecked():
             return scalefactor.Month
-
+  
 
     def resizeEvent(self, event):
         super(MainWindow, self).resizeEvent(event)
@@ -56,12 +60,10 @@ class MainWindow(QMainWindow):
             self.plot_data()
 
     def plot_data(self):
-        # Read data only once
-        if self.data is None:
-            self.data = data_lesen()
-            if not self.data:
-                return
-            self.zeiten, self.yeinDaten, self.yausDaten,  self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
+        self.data = data_lesen()
+        if not self.data:
+            return
+        self.zeiten, self.yeinDaten, self.yausDaten,  self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
 
         # Get size of QGraphicsView
         view_size = self.ui.graphicsView.size()
@@ -125,16 +127,7 @@ class MainWindow(QMainWindow):
             return  zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl
         
 
-        # Sort dates to get the most recent one
-        sorted_dates = sorted(daten.keys())
-        most_recent_date = sorted_dates[-1]
-        last_values = daten[most_recent_date]
-        
-        the_last_value = last_values[-1]
-        gesamtzahl = int(the_last_value[3].strip().replace("$",""))
-        LuftFeuchtigkeit = float(the_last_value[4].strip().replace("%",""))
-        Temp = float(the_last_value[5].strip().replace("C","") )
-
+      
         # if len(last_values) >= 4:
         #     gesamtzahl = int(last_values[3].strip().replace("$", ""))
         # if len(last_values) >= 6:
@@ -142,6 +135,11 @@ class MainWindow(QMainWindow):
         #     Temp = float(last_values[5].strip().replace("C", ""))
         match sc_factor:
             case scalefactor.Normal:
+                last_line = daten[-1].split(",")
+                if len(last_line) >= 6:
+                    gesamtzahl = int(last_line[3].strip().replace("$",""))
+                    LuftFeuchtigkeit = float(last_line[4].strip().replace("%",""))
+                    Temp = float(last_line[5].strip().replace("C",""))
                 for line in daten:
                     verkehr = line.split(",")
                     if len(verkehr) >= 6:
@@ -157,6 +155,17 @@ class MainWindow(QMainWindow):
 
             case scalefactor.Day | scalefactor.Month:
                 zeiten, yeinDaten, yausDaten, yanzMäuser = process_average_data(daten)
+                
+                # Sort dates to get the most recent one
+                sorted_dates = sorted(daten.keys())
+                most_recent_date = sorted_dates[-1]
+                last_values = daten[most_recent_date]
+                
+                the_last_value = last_values[-1]
+                gesamtzahl = int(the_last_value[3].strip().replace("$",""))
+                LuftFeuchtigkeit = float(the_last_value[4].strip().replace("%",""))
+                Temp = float(the_last_value[5].strip().replace("C","") )
+
 
             case _:
                 return [], [], [], [], 0, 0, 0
