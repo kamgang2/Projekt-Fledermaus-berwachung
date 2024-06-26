@@ -96,7 +96,8 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.plotButton, 16, 1, 1, 2)
 
         MainWindow.setCentralWidget(self.centralwidget)
-
+         
+        #Menu 
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         MainWindow.setMenuBar(self.menubar)
@@ -123,6 +124,7 @@ class Ui_MainWindow(object):
      
 
         MainWindow.setMenuBar(self.menubar)
+        
 
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")

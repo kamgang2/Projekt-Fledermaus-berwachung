@@ -1,6 +1,6 @@
 from enum import Enum
 from datetime import datetime
-
+from PySide6.QtWidgets import QMessageBox, QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 
 class scalefactor(Enum): 
     Normal =1 
@@ -14,7 +14,6 @@ class Eigenschaften(Enum):
     Luftfeuchtigkeit = 4
     Temperatur = 5
     
- 
 
 def timescaling(myfile,  sc_factor: scalefactor): 
     try:
@@ -163,7 +162,31 @@ def convert_to_datetime(value):
 
 
 
-def set_anz_fledermaeusen():
-    spinbox = QAbstractSpinBox()
-    spinbox.setVisible(True)
-    
+class SpinBoxDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Anzahl der Fledermauser")
+
+        self.layout = QVBoxLayout(self)
+
+        self.label = QLabel("Geben die Anzahl der Fledermausern ein:")
+        self.layout.addWidget(self.label)
+
+        self.spinbox = QSpinBox(self)
+        self.spinbox.setRange(0, 1000)
+        self.layout.addWidget(self.spinbox)
+
+        self.button_layout = QHBoxLayout()
+
+        self.button_ok = QPushButton("OK")
+        self.button_ok.clicked.connect(self.accept)
+        self.button_layout.addWidget(self.button_ok)
+
+        self.button_cancel = QPushButton("Abbrechen")
+        self.button_cancel.clicked.connect(self.reject)
+        self.button_layout.addWidget(self.button_cancel)
+        
+        self.layout.addLayout(self.button_layout)
+
+    def get_value(self):
+        return self.spinbox.value()

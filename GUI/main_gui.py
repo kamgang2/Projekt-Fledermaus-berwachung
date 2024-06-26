@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLCDNumber, QSpinBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  # Assuming this is your UI file
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, set_anz_fledermaeusen
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog
 import sys
 import numpy as np
 import pyqtgraph as pg
@@ -58,13 +58,25 @@ class MainWindow(QMainWindow):
         # Set the default checked action
         self.ui.actionNormal.setChecked(True)
 
-        self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox())
+        # Spinbox Dialog
+        self.spinbox_dialog = SpinBoxDialog(self)
 
+        # Set value of the Bats
+        self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox_dialog)
+            
         # Connect plot button with plot_data method
         self.ui.plotButton.clicked.connect(self.plot_data)
+        
 
-    def show_spinbox(self):
-        self.spinbox.setVisible(True)
+    def show_spinbox_dialog(self):
+        if self.spinbox_dialog.exec()== QDialog.accepted:
+            value = self.spinbox_dialog.get_value()
+            self.set_anz_fledermause(value)
+
+    def set_anz_fledermause(self,value):
+
+        print(f"Anzahl der Fledermäuse:{value}")
+   
     
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():
