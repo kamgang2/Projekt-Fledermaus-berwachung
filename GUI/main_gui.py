@@ -7,6 +7,7 @@ import numpy as np
 import pyqtgraph as pg
 from PySide6.QtCore import Qt
 import matplotlib.dates as mdates  # Import date2num from matplotlib
+import serial
 
 class CustomAxisItem(pg.AxisItem):
     def __init__(self, labels=None, *args, **kwargs):
@@ -74,8 +75,11 @@ class MainWindow(QMainWindow):
             self.set_anz_fledermause(value)
 
     def set_anz_fledermause(self,value):
-
-        print(f"Anzahl der Fledermäuse:{value}")
+        upload_port = "COM4"
+        baud_rate = 9600
+        serial_monitor = serial.Serial(upload_port, baud_rate)
+        serial_monitor.write("startwert_fleder: ",{value})
+        
    
     
     def get_action_checked(self):
