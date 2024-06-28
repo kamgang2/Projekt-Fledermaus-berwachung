@@ -341,4 +341,11 @@ class Handler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     watch = OnMyWatch()     
-    watch.run()
+
+    file_modified = watch.run()
+    if file_modified:
+        print("file modified")
+    else:
+        print("file not modified")
+
+    

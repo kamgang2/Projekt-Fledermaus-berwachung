@@ -236,4 +236,3 @@ class Handler(FileSystemEventHandler):
 
         if event.event_type == 'deleted' and event.src_path == OnMyWatch.watch_file:
             print(f"Watchdog detected that {event.src_path} has been deleted.")
-

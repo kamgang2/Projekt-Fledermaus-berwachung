@@ -1,13 +1,15 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog,OnMyWatch
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog,OnMyWatch, Handler
 import sys
 import numpy as np
 import pyqtgraph as pg
 from PySide6.QtCore import Qt
 import matplotlib.dates as mdates  # Import date2num from matplotlib
 import serial
+import threading
+import time
 
 class CustomAxisItem(pg.AxisItem):
     def __init__(self, labels=None, *args, **kwargs):
@@ -64,24 +66,31 @@ class MainWindow(QMainWindow):
 
         # Set value of the Bats
         self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox_dialog)
-            
+
         # Connect plot button with plot_data method
-        self.ui.plotButton.clicked.connect(self.plot_data)
-        
+        # self.ui.plotButton.clicked.connect(self.plot_data)
+        self.plot_data()
+
+        self.watch = OnMyWatch()
+        self.handler = Handler()
+        self.watch.observer.schedule(self.handler, self.watch.watch_file, recursive=True)
+        self.watch.observer.start()
+
+        self.stop_plotting = False
+        self.monitor_thread = threading.Thread(target=self.monitor_changes)
+        self.monitor_thread.start()
 
     def show_spinbox_dialog(self):
-        if self.spinbox_dialog.exec()== QDialog.accepted:
+        if self.spinbox_dialog.exec() == QDialog.Accepted:
             value = self.spinbox_dialog.get_value()
             self.set_anz_fledermause(value)
 
-    def set_anz_fledermause(self,value):
+    def set_anz_fledermause(self, value):
         upload_port = "COM4"
         baud_rate = 9600
         serial_monitor = serial.Serial(upload_port, baud_rate)
-        serial_monitor.write("startwert_fleder: ",{value})
-        
-   
-     
+        serial_monitor.write(f"startwert_fleder: {value}".encode())
+
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():
             return scalefactor.Normal
@@ -101,25 +110,25 @@ class MainWindow(QMainWindow):
         if not self.data:
             return
         self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
-        
+
         # Convert times to datetime
         self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
-        
+
         # Create a mapping from time to index for custom axis labels
         time_to_index = {t: i for i, t in enumerate(self.zeiten)}
         indices = [time_to_index[t] for t in self.zeiten]
-        
+
         self.ui.plotWidget.clear()
         self.ui.plotWidget.addLegend()
-        
+
         # Define pens with different thickness
         pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
         pen_aus = {'color': 'r', 'width': 3}  # Thickness for 'Ausfluege'
         pen_anz = {'color': 'b', 'width': 3}  # Thickness for 'Anz Fledermaeuser'
 
-        self.ui.plotWidget.plot(indices, self.yeinDaten, pen= pen_ein, name='Einfluege')
-        self.ui.plotWidget.plot(indices, self.yausDaten, pen= pen_aus, name='Ausfluege')
-        self.ui.plotWidget.plot(indices, self.yanzMäuser, pen= pen_anz, name='Anz Fledermaeuser')
+        self.ui.plotWidget.plot(indices, self.yeinDaten, pen=pen_ein, name='Einfluege')
+        self.ui.plotWidget.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
+        self.ui.plotWidget.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
 
         # Set labels and title
         self.ui.plotWidget.setLabel('left', 'Werte')
@@ -130,8 +139,6 @@ class MainWindow(QMainWindow):
         date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
         custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
         self.ui.plotWidget.setAxisItems({'bottom': custom_axis})
-
-       
 
         # Display total count
         self.ui.lcdGesamtzahl.display(gesamtzahl)
@@ -152,6 +159,15 @@ class MainWindow(QMainWindow):
 
         # Display humidity
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
+
+        # Explizites Neuzeichnen des Widgets
+        self.ui.plotWidget.repaint()
+        self.ui.lcdGesamtzahl.repaint()
+        self.ui.lcdTemp.repaint()
+        self.ui.TempProgessBar.repaint()
+        self.ui.lcdLuft.repaint()
+
+        print("Data plotted successfully")
 
     def process_data(self, data, sc_factor: scalefactor):
         yeinDaten = []
@@ -204,6 +220,19 @@ class MainWindow(QMainWindow):
 
         return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
 
+    def monitor_changes(self):
+        while not self.stop_plotting:
+            time.sleep(5)  # Adjust sleep time as needed
+            if self.watch.file_modified:
+                print("File modification detected. Updating plot.")
+                self.plot_data()
+                self.watch.file_modified = False
+
+    def closeEvent(self, event):
+        self.stop_plotting = True
+        self.watch.observer.stop()
+        self.watch.observer.join()
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
