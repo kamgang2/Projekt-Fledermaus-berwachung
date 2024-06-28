@@ -1,6 +1,11 @@
 from enum import Enum
 from datetime import datetime
 from PySide6.QtWidgets import QMessageBox, QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+import time
+import os
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
 
 class scalefactor(Enum): 
     Normal =1 
@@ -190,3 +195,45 @@ class SpinBoxDialog(QDialog):
 
     def get_value(self):
         return self.spinbox.value()
+    
+# Funktion zur Uberwachung des "serial_data.txt"
+
+class OnMyWatch: 
+    watch_file = os.path.join(os.path.dirname(__file__),"serial_data.txt")
+    file_modified = False
+
+    def __init__(self):
+        self.observer = Observer()
+
+    def run(self):
+        print(f"Watching file: {self.watch_file}")
+
+        if not os.path.exists(self.watch_file):
+            print(f"File '{self.watch_file}' does not exist.")
+            return
+        
+        event_handler = Handler()
+        self.observer.schedule(event_handler,  os.path.dirname(self.watch_file), recursive=False)
+        self.observer.start()
+        try: 
+            time.sleep(5)
+        except KeyboardInterrupt: 
+            self.observer.stop()
+            print("file`s observer stopped")
+
+        self.observer.join()
+        return OnMyWatch.file_modified
+    
+
+class Handler(FileSystemEventHandler): 
+    def on_any_event(self, event):
+        if event.is_directory:
+            return
+
+        if event.event_type == 'modified' and event.src_path == OnMyWatch.watch_file:
+            print(f"Watchdog received modified event for {event.src_path}")
+            OnMyWatch.file_modified = True
+
+        if event.event_type == 'deleted' and event.src_path == OnMyWatch.watch_file:
+            print(f"Watchdog detected that {event.src_path} has been deleted.")
+

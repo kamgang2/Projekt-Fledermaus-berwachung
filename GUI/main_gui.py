@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog
 from PySide6.QtGui import QPixmap, QActionGroup
-from mainwindow import Ui_MainWindow  # Assuming this is your UI file
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog
+from mainwindow import Ui_MainWindow  
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog,OnMyWatch
 import sys
 import numpy as np
 import pyqtgraph as pg
@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
         serial_monitor.write("startwert_fleder: ",{value})
         
    
-    
+     
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():
             return scalefactor.Normal
