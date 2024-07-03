@@ -294,6 +294,7 @@ if __name__ == '__main__':
 
     
 """
+"""
 
 import os
 import time
@@ -343,9 +344,57 @@ if __name__ == "__main__":
     watch = OnMyWatch()     
 
     file_modified = watch.run()
-    if file_modified:
+    if file_modified==True:
         print("file modified")
     else:
         print("file not modified")
+
+    file_modified = False
+
+
+"""
+
+from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+
+        # Erstellen des TabWidgets
+        self.tabs = QTabWidget()
+        self.setCentralWidget(self.tabs)
+
+        # Hinzufügen der Tabs
+        self.create_tabs()
+
+    def create_tabs(self):
+        # Tab 1
+        tab1 = QWidget()
+        tab1_layout = QVBoxLayout()
+        tab1_label = QLabel("Dies ist Tab 1")
+        tab1_layout.addWidget(tab1_label)
+        tab1.setLayout(tab1_layout)
+
+        # Tab 2
+        tab2 = QWidget()
+        tab2_layout = QVBoxLayout()
+        tab2_label = QLabel("Dies ist Tab 2")
+        tab2_layout.addWidget(tab2_label)
+        tab2.setLayout(tab2_layout)
+
+        # Weitere Tabs können auf die gleiche Weise hinzugefügt werden
+
+        # Hinzufügen der Tabs zum TabWidget
+        self.tabs.addTab(tab1, "Tab 1")
+        self.tabs.addTab(tab2, "Tab 2")
+
+if __name__ == "__main__":
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    app.exec()
+    
+
+
 
     

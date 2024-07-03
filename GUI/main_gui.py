@@ -1,15 +1,13 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog,OnMyWatch, Handler
+from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher
 import sys
-import numpy as np
 import pyqtgraph as pg
-from PySide6.QtCore import Qt
-import matplotlib.dates as mdates  # Import date2num from matplotlib
+from PySide6.QtCore import Qt, Slot
 import serial
-import threading
-import time
+import os
+
 
 class CustomAxisItem(pg.AxisItem):
     def __init__(self, labels=None, *args, **kwargs):
@@ -22,6 +20,8 @@ class CustomAxisItem(pg.AxisItem):
             v_str = self.labels.get(v, "")
             strings.append(v_str)
         return strings
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -68,28 +68,23 @@ class MainWindow(QMainWindow):
         self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox_dialog)
 
         # Connect plot button with plot_data method
-        # self.ui.plotButton.clicked.connect(self.plot_data)
         self.plot_data()
 
-        self.watch = OnMyWatch()
-        self.handler = Handler()
-        self.watch.observer.schedule(self.handler, self.watch.watch_file, recursive=True)
-        self.watch.observer.start()
-
-        self.stop_plotting = False
-        self.monitor_thread = threading.Thread(target=self.monitor_changes)
-        self.monitor_thread.start()
+        self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__), "serial_data.txt"))
+        self.file_watcher.file_modified.connect(self.on_file_modified)
+        self.file_watcher.start()
 
     def show_spinbox_dialog(self):
         if self.spinbox_dialog.exec() == QDialog.Accepted:
             value = self.spinbox_dialog.get_value()
             self.set_anz_fledermause(value)
-
+            self.repaint()
+    
     def set_anz_fledermause(self, value):
         upload_port = "COM4"
         baud_rate = 9600
-        serial_monitor = serial.Serial(upload_port, baud_rate)
-        serial_monitor.write(f"startwert_fleder: {value}".encode())
+        with serial.Serial(upload_port, baud_rate) as serial_monitor:
+            serial_monitor.write(f"startwert_fleder: {value}".encode())
 
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():
@@ -104,6 +99,11 @@ class MainWindow(QMainWindow):
         # Redraw plot when window size changes
         if self.data is not None:
             self.plot_data()
+
+    @Slot()
+    def on_file_modified(self):
+        print("File modification detected. Updating plot.")
+        self.plot_data()
 
     def plot_data(self):
         self.data = data_lesen()
@@ -160,7 +160,7 @@ class MainWindow(QMainWindow):
         # Display humidity
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
 
-        # Explizites Neuzeichnen des Widgets
+        # Explicitly redraw the widgets
         self.ui.plotWidget.repaint()
         self.ui.lcdGesamtzahl.repaint()
         self.ui.lcdTemp.repaint()
@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
 
         daten = timescaling(data, sc_factor)
         if not daten:
-            return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl
+            return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
 
         match sc_factor:
             case scalefactor.Normal:
@@ -220,18 +220,8 @@ class MainWindow(QMainWindow):
 
         return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
 
-    def monitor_changes(self):
-        while not self.stop_plotting:
-            time.sleep(5)  # Adjust sleep time as needed
-            if self.watch.file_modified:
-                print("File modification detected. Updating plot.")
-                self.plot_data()
-                self.watch.file_modified = False
-
     def closeEvent(self, event):
-        self.stop_plotting = True
-        self.watch.observer.stop()
-        self.watch.observer.join()
+        self.file_watcher.stop()
         event.accept()
 
 if __name__ == "__main__":

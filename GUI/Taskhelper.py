@@ -1,8 +1,10 @@
 from enum import Enum
 from datetime import datetime
-from PySide6.QtWidgets import QMessageBox, QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PySide6.QtWidgets import QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PySide6.QtCore import Signal, QObject
 import time
 import os
+import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -226,13 +228,50 @@ class OnMyWatch:
     
 
 class Handler(FileSystemEventHandler): 
+    def __init__(self, file_modified_signal):
+        super().__init__()
+        self.file_modified_signal = file_modified_signal
+
     def on_any_event(self, event):
         if event.is_directory:
             return
 
         if event.event_type == 'modified' and event.src_path == OnMyWatch.watch_file:
             print(f"Watchdog received modified event for {event.src_path}")
-            OnMyWatch.file_modified = True
+            self.file_modified_signal.emit()
 
         if event.event_type == 'deleted' and event.src_path == OnMyWatch.watch_file:
             print(f"Watchdog detected that {event.src_path} has been deleted.")
+
+
+class FileWatcher(QObject):
+    file_modified = Signal()
+
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_path = file_path
+        self.observer = None
+        self.thread = None
+
+    def start(self):
+        self.thread = threading.Thread(target=self.run)
+        self.thread.start()
+
+    def run(self):
+        event_handler = Handler(self.file_modified)
+        self.observer = Observer()
+        self.observer.schedule(event_handler, os.path.dirname(self.file_path), recursive=False)
+        self.observer.start()
+        print(f"Watching file: {self.file_path}")
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            self.observer.stop()
+
+        self.observer.join()
+
+    def stop(self):
+        self.observer.stop()
+        self.thread.join()            
