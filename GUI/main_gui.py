@@ -28,7 +28,8 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.plotWidget.setBackground('w')
+        self.ui.plotWidget1.setBackground('w')
+        self.ui.plotWidget2.setBackground('w')
 
         # Set segment style of QLCDNumber widget
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
@@ -118,27 +119,27 @@ class MainWindow(QMainWindow):
         time_to_index = {t: i for i, t in enumerate(self.zeiten)}
         indices = [time_to_index[t] for t in self.zeiten]
 
-        self.ui.plotWidget.clear()
-        self.ui.plotWidget.addLegend()
+        self.ui.plotWidget1.clear()
+        self.ui.plotWidget1.addLegend()
 
         # Define pens with different thickness
         pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
         pen_aus = {'color': 'r', 'width': 3}  # Thickness for 'Ausfluege'
         pen_anz = {'color': 'b', 'width': 3}  # Thickness for 'Anz Fledermaeuser'
 
-        self.ui.plotWidget.plot(indices, self.yeinDaten, pen=pen_ein, name='Einfluege')
-        self.ui.plotWidget.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
-        self.ui.plotWidget.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
+        self.ui.plotWidget1.plot(indices, self.yeinDaten, pen=pen_ein, name='Einfluege')
+        self.ui.plotWidget1.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
+        self.ui.plotWidget1.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
 
         # Set labels and title
-        self.ui.plotWidget.setLabel('left', 'Werte')
-        self.ui.plotWidget.setLabel('bottom', 'Zeit')
-        self.ui.plotWidget.setTitle('Ein- und Aus-Fluege über die Zeit')
+        self.ui.plotWidget1.setLabel('left', 'Werte')
+        self.ui.plotWidget1.setLabel('bottom', 'Zeit')
+        self.ui.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
 
         # Use CustomAxisItem to correctly display custom labels on the x-axis
         date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
         custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
-        self.ui.plotWidget.setAxisItems({'bottom': custom_axis})
+        self.ui.plotWidget1.setAxisItems({'bottom': custom_axis})
 
         # Display total count
         self.ui.lcdGesamtzahl.display(gesamtzahl)
@@ -161,7 +162,7 @@ class MainWindow(QMainWindow):
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
 
         # Explicitly redraw the widgets
-        self.ui.plotWidget.repaint()
+        self.ui.plotWidget1.repaint()
         self.ui.lcdGesamtzahl.repaint()
         self.ui.lcdTemp.repaint()
         self.ui.TempProgessBar.repaint()

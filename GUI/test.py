@@ -385,7 +385,7 @@ class MainWindow(QMainWindow):
         # Weitere Tabs können auf die gleiche Weise hinzugefügt werden
 
         # Hinzufügen der Tabs zum TabWidget
-        self.tabs.addTab(tab1, "Tab 1")
+        self.tabs.addTab(tab1, "Tab BONO")
         self.tabs.addTab(tab2, "Tab 2")
 
 if __name__ == "__main__":
