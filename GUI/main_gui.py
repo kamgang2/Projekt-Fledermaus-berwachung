@@ -38,6 +38,8 @@ class MainWindow(QMainWindow):
         self.yeinDaten = None
         self.yausDaten = None
         self.zeiten = None
+        self.yTemp = None 
+        self.yLuft = None
         self.gesamtzahl = 0
         self.LuftFeuchtigkeit = 0
         self.Temp = 0
@@ -110,7 +112,7 @@ class MainWindow(QMainWindow):
         self.data = data_lesen()
         if not self.data:
             return
-        self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
+        self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser,self.yTemp, self.yLuft, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
 
         # Convert times to datetime
         self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
@@ -119,13 +121,15 @@ class MainWindow(QMainWindow):
         time_to_index = {t: i for i, t in enumerate(self.zeiten)}
         indices = [time_to_index[t] for t in self.zeiten]
 
-        self.ui.plotWidget1.clear()
-        self.ui.plotWidget1.addLegend()
+        # self.ui.plotWidget1.clear()
+        # self.ui.plotWidget1.addLegend()
 
         # Define pens with different thickness
         pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
         pen_aus = {'color': 'r', 'width': 3}  # Thickness for 'Ausfluege'
         pen_anz = {'color': 'b', 'width': 3}  # Thickness for 'Anz Fledermaeuser'
+        pen_temp = pg.mkPen(color = 'r', width = 3)
+        pen_luft = pg.mkPen(color = 'b', width = 3)
 
         self.ui.plotWidget1.plot(indices, self.yeinDaten, pen=pen_ein, name='Einfluege')
         self.ui.plotWidget1.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
@@ -140,6 +144,37 @@ class MainWindow(QMainWindow):
         date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
         custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
         self.ui.plotWidget1.setAxisItems({'bottom': custom_axis})
+
+        # Plotwidget2 
+        p1 = self.ui.plotWidget2
+        p2 = pg.ViewBox()
+
+        p1.clear()
+        p1.showAxis('right')
+        p1.scene().addItem(p2)
+        p1.getAxis('right').linkToView(p2)
+        p2.setXLink(p1)
+
+        p1.plot(indices, self.yTemp, pen=pen_temp, name='Temperature (°C)')
+        p2.addItem(pg.PlotDataItem(indices, self.yLuft, pen=pen_luft, name="Luftfeuchtigkeit (%)"))
+
+        def updateViews():
+            p2.setGeometry(p1.getViewBox().sceneBoundingRect())
+            p2.linkedViewChanged(p1.getViewBox(), p2.XAxis)
+
+        p1.getViewBox().sigResized.connect(updateViews)
+        p1.setLabel('bottom', 'Zeit')
+        p1.setLabel('left', 'Temperatur (°C)')
+        p1.setTitle('Temperature und Luftfeuchtigkeit über die Zeit')
+        p1.setYRange(-10, 50, padding=0)
+        p1.getAxis('right').setLabel('Luftfeuchtigkeit (%)', color='blue')
+        p2.setYRange(0, 100, padding=0)
+        
+        # Use CustomAxisItem to correctly display custom labels on the x-axis for plotWidget2
+        date_labels_plotWidget2 = {i: str(t) for i, t in enumerate(self.zeiten)}
+        custom_axis_plotWidget2 = CustomAxisItem(labels=date_labels_plotWidget2, orientation='bottom')
+        p1.setAxisItems({'bottom': custom_axis_plotWidget2})
+
 
         # Display total count
         self.ui.lcdGesamtzahl.display(gesamtzahl)
@@ -175,13 +210,15 @@ class MainWindow(QMainWindow):
         yausDaten = []
         yanzMäuser = []
         zeiten = []
+        yTemperature = []
+        yLuft_F = []
         gesamtzahl = 0
         Temp = 0
         LuftFeuchtigkeit = 0
 
         daten = timescaling(data, sc_factor)
         if not daten:
-            return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
+            return zeiten, yeinDaten, yausDaten, yanzMäuser,yTemperature,yLuft_F ,gesamtzahl, LuftFeuchtigkeit, Temp
 
         match sc_factor:
             case scalefactor.Normal:
@@ -197,14 +234,18 @@ class MainWindow(QMainWindow):
                         yein = int(verkehr[1].strip().replace("->", ""))
                         yaus = int(verkehr[2].strip().replace("<-", ""))
                         yanz = int(verkehr[3].strip().replace("$", ""))
+                        y_temp = float(verkehr[5].strip().replace("C", ""))
+                        y_luft = float(verkehr[4].strip().replace("%", ""))
 
                         zeiten.append(zeit)
                         yeinDaten.append(yein)
                         yausDaten.append(yaus)
                         yanzMäuser.append(yanz)
+                        yTemperature.append(y_temp)
+                        yLuft_F.append(y_luft)
 
             case scalefactor.Day | scalefactor.Month:
-                zeiten, yeinDaten, yausDaten, yanzMäuser = process_average_data(daten)
+                zeiten, yeinDaten, yausDaten, yanzMäuser, yTemperature, yLuft_F = process_average_data(daten)
                 
                 # Sort dates to get the most recent one
                 sorted_dates = sorted(daten.keys())
@@ -219,7 +260,7 @@ class MainWindow(QMainWindow):
             case _:
                 return [], [], [], [], 0, 0, 0
 
-        return zeiten, yeinDaten, yausDaten, yanzMäuser, gesamtzahl, LuftFeuchtigkeit, Temp
+        return zeiten, yeinDaten, yausDaten, yanzMäuser,yTemperature,yLuft_F ,gesamtzahl, LuftFeuchtigkeit, Temp
 
     def closeEvent(self, event):
         self.file_watcher.stop()

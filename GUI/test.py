@@ -353,7 +353,7 @@ if __name__ == "__main__":
 
 
 """
-
+"""
 from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel
 
 class MainWindow(QMainWindow):
@@ -393,8 +393,55 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
-    
+    """
 
+import pyqtgraph as pg
+from PySide6 import QtWidgets
+import numpy as np
 
+# Erstelle eine QApplication-Instanz
+app = pg.mkQApp()
 
-    
+# Erstelle ein Plot-Widget
+win = pg.GraphicsLayoutWidget(show=True)
+win.setWindowTitle('Mehrere Y-Achsen Beispiel')
+
+# Erstelle zwei Plots, die dieselbe X-Achse teilen
+p1 = win.addPlot()
+p2 = pg.ViewBox()
+
+# Konfiguriere die zweite Y-Achse (rechts)
+p1.showAxis('right')
+p1.scene().addItem(p2)
+p1.getAxis('right').linkToView(p2)
+p2.setXLink(p1)
+
+# Daten generieren
+x = np.linspace(0, 10, 100)
+y1 = np.sin(x) * 20 + 25  # Beispiel-Daten für Temperatur (in Grad Celsius)
+y2 = np.cos(x) * 50 + 50  # Beispiel-Daten für Prozentwerte
+
+# Plotte die Daten
+curve1 = p1.plot(x, y1, pen='r', name="Temperatur (°C)")
+curve2 = pg.PlotDataItem(x, y2, pen='b', name="Prozent (%)")
+p2.addItem(curve2)
+
+# Synchronisiere die Ansichten
+def updateViews():
+    p2.setGeometry(p1.vb.sceneBoundingRect())
+    p2.linkedViewChanged(p1.vb, p2.XAxis)
+
+p1.vb.sigResized.connect(updateViews)
+
+# Setze Achsenbezeichnungen und Bereiche
+p1.setLabel('left', 'Temperatur (°C)', color='red')
+p1.setLabel('bottom', 'Zeit (s)')
+p1.setYRange(-10, 50, padding=0)
+
+p1.getAxis('right').setLabel('Prozent (%)', color='blue')
+p2.setYRange(0, 100, padding=0)
+
+# Starte die Qt-Anwendung
+if __name__ == '__main__':
+    updateViews()
+    QtWidgets.QApplication.instance().exec()

@@ -94,15 +94,15 @@ def getAverage(data, whichValue : Eigenschaften):
                 total_value += value
                 count += 1
             
-            # if whichValue == Eigenschaften.Luftfeuchtigkeit:
-            #     value = int(item[4].replace("%","").strip())
-            #     total_value += value
-            #     count += 1
+            if whichValue == Eigenschaften.Luftfeuchtigkeit:
+                value = int(item[4].replace("%","").strip())
+                total_value += value
+                count += 1
 
-            # if whichValue == Eigenschaften.Temperatur:
-            #     value = int(item[5].replace("C","").strip())
-            #     total_value += value
-            #     count += 1
+            if whichValue == Eigenschaften.Temperatur:
+                value = int(item[5].replace("C","").strip())
+                total_value += value
+                count += 1
 
         if count > 0:
             average_value = total_value / count
@@ -139,7 +139,7 @@ def data_lesen():
 
 
 def process_average_data(daten):
-    zeiten, yeinDaten, yausDaten, yanzMäuser = [], [], [], []
+    zeiten, yeinDaten, yausDaten, yanzMäuser, yTemp, yLuft = [], [], [], [], [], []
     averagesEin = getAverage(daten, Eigenschaften.Eingaenge)
     averagesAus = getAverage(daten, Eigenschaften.Ausgaenge)
     averageSum = getAverage(daten, Eigenschaften.Summe)
@@ -151,8 +151,10 @@ def process_average_data(daten):
         yeinDaten.append(averagesEin.get(key, 0))
         yausDaten.append(averagesAus.get(key, 0))
         yanzMäuser.append(averageSum.get(key, 0))
+        yTemp.append(averageTemp.get(key,0))
+        yLuft.append(averageLuft_F.get(key, 0))
     
-    return zeiten, yeinDaten, yausDaten, yanzMäuser
+    return zeiten, yeinDaten, yausDaten, yanzMäuser, yTemp, yLuft
 
 
 def convert_to_datetime(value):
@@ -254,7 +256,7 @@ class FileWatcher(QObject):
         self.thread = None
 
     def start(self):
-        self.thread = threading.Thread(target=self.run)
+        self.thread = threading.Thread(target=self.run,  daemon=True)
         self.thread.start()
 
     def run(self):
@@ -274,4 +276,4 @@ class FileWatcher(QObject):
 
     def stop(self):
         self.observer.stop()
-        self.thread.join()            
+                
