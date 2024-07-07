@@ -74,12 +74,7 @@ class Ui_MainWindow(object):
         self.TempLabel.setAlignment(Qt.AlignCenter)
         self.gridLayout.addWidget(self.TempLabel, 3, 1)
 
-        # Temperatur Fortschrittsbalken
-        self.TempProgessBar = QProgressBar(self.centralwidget)
-        self.TempProgessBar.setObjectName(u"TempProgessBar")
-        self.TempProgessBar.setRange(-20, 50)
-        self.TempProgessBar.setOrientation(Qt.Vertical)
-        self.gridLayout.addWidget(self.TempProgessBar, 0, 2, 3, 1)
+        
 
         # Luftfeuchtigkeit LCD
         self.lcdLuft = QLCDNumber(self.centralwidget)
@@ -95,6 +90,13 @@ class Ui_MainWindow(object):
         self.LuftLabel.setObjectName(u"LuftLabel")
         self.LuftLabel.setAlignment(Qt.AlignCenter)
         self.gridLayout.addWidget(self.LuftLabel, 9, 1)
+
+        # Luftfeuchtigkeit Fortschrittsbalken
+        self.LuftProgessBar = QProgressBar(self.centralwidget)
+        self.LuftProgessBar.setObjectName(u"LuftProgessBar")
+        self.LuftProgessBar.setRange(0, 100)
+        self.LuftProgessBar.setOrientation(Qt.Vertical)
+        self.gridLayout.addWidget(self.LuftProgessBar, 6, 2, 3, 1)
 
         # Gesamtzahl LCD
         self.lcdGesamtzahl = QLCDNumber(self.centralwidget)

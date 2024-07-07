@@ -56,6 +56,11 @@ class MainWindow(QMainWindow):
         self.ui.actionTag.setCheckable(True)
         self.ui.actionMonat.setCheckable(True)
 
+        self.ui.actionNormal.triggered.connect(self.plot_data)
+        self.ui.actionTag.triggered.connect(self.plot_data)
+        self.ui.actionMonat.triggered.connect(self.plot_data)
+        
+
         # Add actions to the group
         self.scaleActionGroup.addAction(self.ui.actionNormal)
         self.scaleActionGroup.addAction(self.ui.actionTag)
@@ -109,6 +114,8 @@ class MainWindow(QMainWindow):
         self.plot_data()
 
     def plot_data(self):
+        self.ui.plotWidget1.clear()
+        self.ui.plotWidget2.clear()
         self.data = data_lesen()
         if not self.data:
             return
@@ -181,26 +188,16 @@ class MainWindow(QMainWindow):
 
         # Display temperature
         self.ui.lcdTemp.display(Temp)
-        self.ui.TempProgessBar.setValue(Temp)
-        if Temp < -5:
-            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: blue; }")
-        elif -5 <= Temp < 5:
-            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: lightblue; }")
-        elif 5 <= Temp < 25:
-            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: green; }")
-        elif 25 <= Temp < 35:
-            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: yellow; }")
-        else:
-            self.ui.TempProgessBar.setStyleSheet("QProgressBar::chunk {background-color: red; }")
 
         # Display humidity
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
+        self.ui.LuftProgessBar.setValue(LuftFeuchtigkeit)
 
         # Explicitly redraw the widgets
         self.ui.plotWidget1.repaint()
         self.ui.lcdGesamtzahl.repaint()
         self.ui.lcdTemp.repaint()
-        self.ui.TempProgessBar.repaint()
+        self.ui.LuftProgessBar.repaint()
         self.ui.lcdLuft.repaint()
 
         print("Data plotted successfully")

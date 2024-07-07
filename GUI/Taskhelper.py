@@ -95,12 +95,12 @@ def getAverage(data, whichValue : Eigenschaften):
                 count += 1
             
             if whichValue == Eigenschaften.Luftfeuchtigkeit:
-                value = int(item[4].replace("%","").strip())
+                value = float(item[4].replace("%","").strip())
                 total_value += value
                 count += 1
 
             if whichValue == Eigenschaften.Temperatur:
-                value = int(item[5].replace("C","").strip())
+                value = float(item[5].replace("C","").strip())
                 total_value += value
                 count += 1
 
