@@ -49,6 +49,8 @@ class Ui_MainWindow(object):
         self.tab2.setObjectName(u"tab2")
         self.tab2Layout = QVBoxLayout(self.tab2)
         self.plotWidget2 = pg.PlotWidget(self.tab2)
+        self.viewBox = pg.ViewBox()
+        self.plotWidget2.scene().addItem(self.viewBox)
         self.plotWidget2.setObjectName(u"plotWidget2")
         self.tab2Layout.addWidget(self.plotWidget2)
         self.tabWidget.addTab(self.tab2, "Umgebungsvariablen")

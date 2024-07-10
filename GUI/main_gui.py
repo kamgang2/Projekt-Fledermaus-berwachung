@@ -1,12 +1,15 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  
-from Taskhelper import timescaling, getAverage, data_lesen, scalefactor, Eigenschaften, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher
+from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher
+from file_handler import file_writter, data_lesen, data_in_excel_speichern
 import sys
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, Slot
 import serial
 import os
+import time
+import threading
 
 
 class CustomAxisItem(pg.AxisItem):
@@ -27,6 +30,27 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
+
+       # Configure the serial port and the baud rate
+        self.serial_port1 = 'COM4'  # Replace with your serial port
+        self.serial_port2 = 'COM5'
+        self.baud_rate = 9600
+        self.output_file = 'serial_data.txt'
+        
+        try:
+            # Open the serial port
+            self.ser1 = serial.Serial(self.serial_port1, self.baud_rate)
+            self.ser2 = serial.Serial(self.serial_port2, self.baud_rate)
+            time.sleep(2)  # Wait for the serial connection to initialize
+            print(f"Connected to {self.serial_port1} at {self.baud_rate} baud.")
+            print(f"Connected to {self.serial_port2} at {self.baud_rate} baud.")
+        except serial.SerialException as e:
+            print(f"Error opening serial port {self.serial_port1}: {e}")
+            print(f"Error opening serial port {self.serial_port2}: {e}")
+            self.ser1 = None
+            self.ser2 = None
+            
+
         self.ui.setupUi(self)
         self.ui.plotWidget1.setBackground('w')
         self.ui.plotWidget2.setBackground('w')
@@ -75,10 +99,13 @@ class MainWindow(QMainWindow):
         # Set value of the Bats
         self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox_dialog)
 
+        # Save the Data in Excel file 
+        self.ui.actionExportExcel.triggered.connect(data_in_excel_speichern)
+
         # Connect plot button with plot_data method
         self.plot_data()
 
-        self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__), "serial_data.txt"))
+        self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__),  self.output_file))
         self.file_watcher.file_modified.connect(self.on_file_modified)
         self.file_watcher.start()
 
@@ -89,10 +116,10 @@ class MainWindow(QMainWindow):
             self.repaint()
     
     def set_anz_fledermause(self, value):
-        upload_port = "COM4"
-        baud_rate = 9600
-        with serial.Serial(upload_port, baud_rate) as serial_monitor:
-            serial_monitor.write(f"startwert_fleder: {value}".encode())
+        try: 
+            self.ser1.write(f"startwert_fleder: {value}".encode())
+        except :
+            print("Error with com port")
 
     def get_action_checked(self):
         if self.ui.actionNormal.isChecked():
@@ -116,7 +143,13 @@ class MainWindow(QMainWindow):
     def plot_data(self):
         self.ui.plotWidget1.clear()
         self.ui.plotWidget2.clear()
-        self.data = data_lesen()
+        self.ui.viewBox.clear()
+
+        # Plotwidget2 
+        p1 = self.ui.plotWidget2
+        p2 =  self.ui.viewBox 
+
+        self.data = data_lesen(self.output_file)
         if not self.data:
             return
         self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser,self.yTemp, self.yLuft, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
@@ -151,14 +184,9 @@ class MainWindow(QMainWindow):
         date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
         custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
         self.ui.plotWidget1.setAxisItems({'bottom': custom_axis})
-
-        # Plotwidget2 
-        p1 = self.ui.plotWidget2
-        p2 = pg.ViewBox()
-
-        p1.clear()
+      
         p1.showAxis('right')
-        p1.scene().addItem(p2)
+        #p1.scene().addItem(p2)
         p1.getAxis('right').linkToView(p2)
         p2.setXLink(p1)
 
@@ -195,6 +223,7 @@ class MainWindow(QMainWindow):
 
         # Explicitly redraw the widgets
         self.ui.plotWidget1.repaint()
+        self.ui.plotWidget2.repaint()
         self.ui.lcdGesamtzahl.repaint()
         self.ui.lcdTemp.repaint()
         self.ui.LuftProgessBar.repaint()
@@ -263,8 +292,20 @@ class MainWindow(QMainWindow):
         self.file_watcher.stop()
         event.accept()
 
+    def start_file_writer(self):
+        if self.ser1 and self.ser2:
+            # Thread for file writing
+            thread_file_writer = threading.Thread(
+                target=file_writter,
+                args=(self.serial_port1, self.serial_port2, self.ser1, self.ser2, self.output_file),
+                daemon=True
+            )
+            thread_file_writer.start()
+      
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
+   # window.start_fileWritter()
     window.show()
     sys.exit(app.exec())

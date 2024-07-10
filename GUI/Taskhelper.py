@@ -37,7 +37,7 @@ def timescaling(myfile,  sc_factor: scalefactor):
         
         if(sc_factor == scalefactor.Month): 
             for el in lines: 
-                key = el[0].split("-")[1]
+                key = el[0].split(".")[1]
 
                 if key not in groupedDate: 
                     groupedDate[key] = []
@@ -45,7 +45,7 @@ def timescaling(myfile,  sc_factor: scalefactor):
 
         if(sc_factor == scalefactor.Day):
             for el in lines: 
-                key =  el[0].split("-")[0]+ "-" + el[0].split("-")[1]
+                key =  el[0].split(".")[0]+ "." + el[0].split(".")[1]
                 if key not in groupedDate: 
                     groupedDate[key]=[]
                 groupedDate[key].append(el)
@@ -113,24 +113,6 @@ def getAverage(data, whichValue : Eigenschaften):
     return averages
 
 
-def data_lesen():
-        # Öffnen der Datei im Lesemodus
-        try:
-            with open("serial_data.txt", "r") as myfile:
-                # Initialisieren einer leeren Liste, um die Zeilen zu speichern
-                lines = []
-                
-                # Durchlaufen jeder Zeile in der Datei
-                for line in myfile:
-                    # Entfernen des Zeilenumbruchs und Hinzufügen zur Liste
-                    lines.append(line.strip())
-                
-                # Rückgabe der Liste mit den Zeilen
-                return lines
-        except FileNotFoundError:
-            print("Datei 'serial_data.txt' nicht gefunden.")
-            return []
-
 # data = timescaling("day")
 # averages = getAverage(data, "ein")
 # for key, average in averages.items():
@@ -160,11 +142,11 @@ def process_average_data(daten):
 def convert_to_datetime(value):
         try:
             # Versuchen, den Wert in ein datetime-Objekt umzuwandeln
-            return datetime.strptime(value, '%d-%m-%Y %H:%M:%S')
+            return datetime.strptime(value, '%d.%m.%Y %H:%M:%S')
         except ValueError:
             try:
                 # Versuchen, den Wert in ein Datum ohne Uhrzeit umzuwandeln
-                return datetime.strptime(value, '%d-%m-%Y').date()
+                return datetime.strptime(value, '%d.%m.%Y').date()
             except ValueError:
                 # Wenn beide Versuche fehlschlagen, den Wert als Text beibehalten
                 return value
