@@ -6,7 +6,7 @@ from openpyxl.styles import Alignment, PatternFill, Border, Side
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
 
-def file_writter(serial_port1, serial_port2, ser1, ser2, output_file): 
+def file_writter(serial_port1, serial_port2, ser1, ser2, output_file, file_lock): 
     data1 = None
     data2 = None
 
@@ -14,35 +14,36 @@ def file_writter(serial_port1, serial_port2, ser1, ser2, output_file):
     with open(output_file, 'a') as file:
         try:
             while True:
-                if ser1.in_waiting > 0 : 
-                    # Read a line from the serial port
-                    data1 = ser1.readline().decode('utf-8').strip() 
-                    print(f"Received from {serial_port1}: {data1}")
-                    ##timestamp = datetime.datetime.now()
-                    # Print the line to the console
-                    #myDataLine =timestamp.strftime("%d-%m-%Y %H:%M:%S")+","+ line1 
-                
-                    # Write the line to the file
-                    # file.write(myDataLine + '\n')
+                with file_lock:
+                    if ser1.in_waiting > 0 : 
+                        # Read a line from the serial port
+                        data1 = ser1.readline().decode('utf-8').strip() 
+                        print(f"Received from {serial_port1}: {data1}")
+                        ##timestamp = datetime.datetime.now()
+                        # Print the line to the console
+                        #myDataLine =timestamp.strftime("%d-%m-%Y %H:%M:%S")+","+ line1 
+                    
+                        # Write the line to the file
+                        # file.write(myDataLine + '\n')
 
-                if ser2.in_waiting > 0:
-                    data2 = ser2.readline().decode('utf-8').strip()
-                    print(f"received from{serial_port2}: {data2}")
+                    if ser2.in_waiting > 0:
+                        data2 = ser2.readline().decode('utf-8').strip()
+                        print(f"received from{serial_port2}: {data2}")
 
-                if data1 is not None and data2 is not None:
-                    timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-                    myDataLine = f"{timestamp},{data1},{data2}"
-                    print(f"Writing to file: {myDataLine}")
-                    file.write(myDataLine + '\n')
-                    file.flush()  # Ensure the data is written to the file immediately
-                    # Reset the data after writing
-                    data1 = None
-                    data2 = None
+                    if data1 is not None and data2 is not None:
+                        timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+                        myDataLine = f"{timestamp},{data1},{data2}"
+                        print(f"Writing to file: {myDataLine}")
+                        file.write(myDataLine + '\n')
+                        file.flush()  # Ensure the data is written to the file immediately
+                        # Reset the data after writing
+                        data1 = None
+                        data2 = None
+                        time.sleep(1)  # Add a small delay to prevent high CPU usage
+
+                    else:
+                        print("No data waiting in the serial buffer.")
                     time.sleep(1)  # Add a small delay to prevent high CPU usage
-
-                else:
-                    print("No data waiting in the serial buffer.")
-                time.sleep(1)  # Add a small delay to prevent high CPU usage
         except KeyboardInterrupt:
             print("Program interrupted. Closing...")
         except serial.SerialException as e:

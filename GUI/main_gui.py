@@ -10,6 +10,7 @@ import serial
 import os
 import time
 import threading
+import serial
 
 
 class CustomAxisItem(pg.AxisItem):
@@ -30,6 +31,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
+        self.lock = threading.Lock() 
 
        # Configure the serial port and the baud rate
         self.serial_port1 = 'COM4'  # Replace with your serial port
@@ -100,15 +102,17 @@ class MainWindow(QMainWindow):
         self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox_dialog)
 
         # Save the Data in Excel file 
-        data_speichern = self.output_file
         self.ui.actionExportExcel.triggered.connect(self.data_in_excel_speichern)
 
         # Connect plot button with plot_data method
         self.plot_data()
 
         self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__),  self.output_file))
-        self.file_watcher.file_modified.connect(self.on_file_modified)
         self.file_watcher.start()
+        self.file_watcher.file_modified.connect(self.on_file_modified)
+        
+        self.start_file_writer()
+
 
     def show_spinbox_dialog(self):
         if self.spinbox_dialog.exec() == QDialog.Accepted:
@@ -142,95 +146,96 @@ class MainWindow(QMainWindow):
         self.plot_data()
 
     def plot_data(self):
-        self.ui.plotWidget1.clear()
-        self.ui.plotWidget2.clear()
-        self.ui.viewBox.clear()
+        with self.lock:
+            self.ui.plotWidget1.clear()
+            self.ui.plotWidget2.clear()
+            self.ui.viewBox.clear()
 
-        # Plotwidget2 
-        p1 = self.ui.plotWidget2
-        p2 =  self.ui.viewBox 
+            # Plotwidget2 
+            p1 = self.ui.plotWidget2
+            p2 =  self.ui.viewBox 
 
-        self.data = data_lesen(self.output_file)
-        if not self.data:
-            return
-        self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser,self.yTemp, self.yLuft, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
+            self.data = data_lesen(self.output_file)
+            if not self.data:
+                return
+            self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser,self.yTemp, self.yLuft, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
 
-        # Convert times to datetime
-        self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
+            # Convert times to datetime
+            self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
 
-        # Create a mapping from time to index for custom axis labels
-        time_to_index = {t: i for i, t in enumerate(self.zeiten)}
-        indices = [time_to_index[t] for t in self.zeiten]
+            # Create a mapping from time to index for custom axis labels
+            time_to_index = {t: i for i, t in enumerate(self.zeiten)}
+            indices = [time_to_index[t] for t in self.zeiten]
 
-        # self.ui.plotWidget1.clear()
-        # self.ui.plotWidget1.addLegend()
+            # self.ui.plotWidget1.clear()
+            # self.ui.plotWidget1.addLegend()
 
-        # Define pens with different thickness
-        pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
-        pen_aus = {'color': 'r', 'width': 3}  # Thickness for 'Ausfluege'
-        pen_anz = {'color': 'b', 'width': 3}  # Thickness for 'Anz Fledermaeuser'
-        pen_temp = pg.mkPen(color = 'r', width = 3)
-        pen_luft = pg.mkPen(color = 'b', width = 3)
+            # Define pens with different thickness
+            pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
+            pen_aus = {'color': 'r', 'width': 3}  # Thickness for 'Ausfluege'
+            pen_anz = {'color': 'b', 'width': 3}  # Thickness for 'Anz Fledermaeuser'
+            pen_temp = pg.mkPen(color = 'r', width = 3)
+            pen_luft = pg.mkPen(color = 'b', width = 3)
 
-        self.ui.plotWidget1.plot(indices, self.yeinDaten, pen=pen_ein, name='Einfluege')
-        self.ui.plotWidget1.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
-        self.ui.plotWidget1.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
+            self.ui.plotWidget1.plot(indices, self.yeinDaten, pen=pen_ein, name='Einfluege')
+            self.ui.plotWidget1.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
+            self.ui.plotWidget1.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
 
-        # Set labels and title
-        self.ui.plotWidget1.setLabel('left', 'Werte')
-        self.ui.plotWidget1.setLabel('bottom', 'Zeit')
-        self.ui.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
+            # Set labels and title
+            self.ui.plotWidget1.setLabel('left', 'Werte')
+            self.ui.plotWidget1.setLabel('bottom', 'Zeit')
+            self.ui.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
 
-        # Use CustomAxisItem to correctly display custom labels on the x-axis
-        date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
-        custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
-        self.ui.plotWidget1.setAxisItems({'bottom': custom_axis})
-      
-        p1.showAxis('right')
-        #p1.scene().addItem(p2)
-        p1.getAxis('right').linkToView(p2)
-        p2.setXLink(p1)
-
-        p1.plot(indices, self.yTemp, pen=pen_temp, name='Temperature (°C)')
-        p2.addItem(pg.PlotDataItem(indices, self.yLuft, pen=pen_luft, name="Luftfeuchtigkeit (%)"))
-
-        def updateViews():
-            p2.setGeometry(p1.getViewBox().sceneBoundingRect())
-            p2.linkedViewChanged(p1.getViewBox(), p2.XAxis)
-
-        p1.getViewBox().sigResized.connect(updateViews)
-        p1.setLabel('bottom', 'Zeit')
-        p1.setLabel('left', 'Temperatur (°C)')
-        p1.setTitle('Temperature und Luftfeuchtigkeit über die Zeit')
-        p1.setYRange(-10, 50, padding=0)
-        p1.getAxis('right').setLabel('Luftfeuchtigkeit (%)', color='blue')
-        p2.setYRange(0, 100, padding=0)
+            # Use CustomAxisItem to correctly display custom labels on the x-axis
+            date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
+            custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
+            self.ui.plotWidget1.setAxisItems({'bottom': custom_axis})
         
-        # Use CustomAxisItem to correctly display custom labels on the x-axis for plotWidget2
-        date_labels_plotWidget2 = {i: str(t) for i, t in enumerate(self.zeiten)}
-        custom_axis_plotWidget2 = CustomAxisItem(labels=date_labels_plotWidget2, orientation='bottom')
-        p1.setAxisItems({'bottom': custom_axis_plotWidget2})
+            p1.showAxis('right')
+            #p1.scene().addItem(p2)
+            p1.getAxis('right').linkToView(p2)
+            p2.setXLink(p1)
+
+            p1.plot(indices, self.yTemp, pen=pen_temp, name='Temperature (°C)')
+            p2.addItem(pg.PlotDataItem(indices, self.yLuft, pen=pen_luft, name="Luftfeuchtigkeit (%)"))
+
+            def updateViews():
+                p2.setGeometry(p1.getViewBox().sceneBoundingRect())
+                p2.linkedViewChanged(p1.getViewBox(), p2.XAxis)
+
+            p1.getViewBox().sigResized.connect(updateViews)
+            p1.setLabel('bottom', 'Zeit')
+            p1.setLabel('left', 'Temperatur (°C)')
+            p1.setTitle('Temperature und Luftfeuchtigkeit über die Zeit')
+            p1.setYRange(-10, 50, padding=0)
+            p1.getAxis('right').setLabel('Luftfeuchtigkeit (%)', color='blue')
+            p2.setYRange(0, 100, padding=0)
+            
+            # Use CustomAxisItem to correctly display custom labels on the x-axis for plotWidget2
+            date_labels_plotWidget2 = {i: str(t) for i, t in enumerate(self.zeiten)}
+            custom_axis_plotWidget2 = CustomAxisItem(labels=date_labels_plotWidget2, orientation='bottom')
+            p1.setAxisItems({'bottom': custom_axis_plotWidget2})
 
 
-        # Display total count
-        self.ui.lcdGesamtzahl.display(gesamtzahl)
+            # Display total count
+            self.ui.lcdGesamtzahl.display(gesamtzahl)
 
-        # Display temperature
-        self.ui.lcdTemp.display(Temp)
+            # Display temperature
+            self.ui.lcdTemp.display(Temp)
 
-        # Display humidity
-        self.ui.lcdLuft.display(LuftFeuchtigkeit)
-        self.ui.LuftProgessBar.setValue(LuftFeuchtigkeit)
+            # Display humidity
+            self.ui.lcdLuft.display(LuftFeuchtigkeit)
+            self.ui.LuftProgessBar.setValue(LuftFeuchtigkeit)
 
-        # Explicitly redraw the widgets
-        self.ui.plotWidget1.repaint()
-        self.ui.plotWidget2.repaint()
-        self.ui.lcdGesamtzahl.repaint()
-        self.ui.lcdTemp.repaint()
-        self.ui.LuftProgessBar.repaint()
-        self.ui.lcdLuft.repaint()
+            # Explicitly redraw the widgets
+            self.ui.plotWidget1.repaint()
+            self.ui.plotWidget2.repaint()
+            self.ui.lcdGesamtzahl.repaint()
+            self.ui.lcdTemp.repaint()
+            self.ui.LuftProgessBar.repaint()
+            self.ui.lcdLuft.repaint()
 
-        print("Data plotted successfully")
+            print("Data plotted successfully")
 
     def process_data(self, data, sc_factor: scalefactor):
         yeinDaten = []
@@ -329,9 +334,10 @@ class MainWindow(QMainWindow):
     def start_file_writer(self):
         if self.ser1 and self.ser2:
             # Thread for file writing
+            print("Thread for file_writer")
             thread_file_writer = threading.Thread(
                 target=file_writter,
-                args=(self.serial_port1, self.serial_port2, self.ser1, self.ser2, self.output_file),
+                args=(self.serial_port1, self.serial_port2, self.ser1, self.ser2, self.output_file, self.lock),
                 daemon=True
             )
             thread_file_writer.start()

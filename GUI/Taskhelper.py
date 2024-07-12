@@ -79,30 +79,31 @@ def getAverage(data, whichValue : Eigenschaften):
         count = 0
         
         for item in group:
-            if whichValue == Eigenschaften.Eingaenge:
-                value = int(item[1].replace("->", "").strip())
-                total_value += value
-                count += 1
+            if len(item) >= 6:
+                if whichValue == Eigenschaften.Eingaenge:
+                    value = int(item[1].replace("->", "").strip())
+                    total_value += value
+                    count += 1
 
-            if whichValue == Eigenschaften.Ausgaenge:
-                value = int(item[2].replace("<-","").strip())
-                total_value += value
-                count += 1
+                if whichValue == Eigenschaften.Ausgaenge:
+                    value = int(item[2].replace("<-","").strip())
+                    total_value += value
+                    count += 1
 
-            if whichValue == Eigenschaften.Summe:
-                value = int(item[3].replace("$","").strip())
-                total_value += value
-                count += 1
-            
-            if whichValue == Eigenschaften.Luftfeuchtigkeit:
-                value = float(item[4].replace("%","").strip())
-                total_value += value
-                count += 1
+                if whichValue == Eigenschaften.Summe:
+                    value = int(item[3].replace("$","").strip())
+                    total_value += value
+                    count += 1
+                
+                if whichValue == Eigenschaften.Luftfeuchtigkeit:
+                    value = float(item[4].replace("%","").strip())
+                    total_value += value
+                    count += 1
 
-            if whichValue == Eigenschaften.Temperatur:
-                value = float(item[5].replace("C","").strip())
-                total_value += value
-                count += 1
+                if whichValue == Eigenschaften.Temperatur:
+                    value = float(item[5].replace("C","").strip())
+                    total_value += value
+                    count += 1
 
         if count > 0:
             average_value = total_value / count
@@ -240,6 +241,7 @@ class FileWatcher(QObject):
     def start(self):
         self.thread = threading.Thread(target=self.run,  daemon=True)
         self.thread.start()
+        print("file watcher Thread gestartet")
 
     def run(self):
         event_handler = Handler(self.file_modified)
@@ -255,6 +257,7 @@ class FileWatcher(QObject):
             self.observer.stop()
 
         self.observer.join()
+        print("File watcher thread stopped.")
 
     def stop(self):
         self.observer.stop()
