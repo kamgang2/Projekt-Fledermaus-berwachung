@@ -1,8 +1,8 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit
 from PySide6.QtGui import QPixmap, QActionGroup
 from mainwindow import Ui_MainWindow  
 from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher
-from file_handler import file_writter, data_lesen, data_in_excel_speichern
+from file_handler import file_writter, data_lesen, data_lesen_zeitraum
 import sys
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, Slot
@@ -100,7 +100,8 @@ class MainWindow(QMainWindow):
         self.ui.actionSetAnzFledermause.triggered.connect(self.show_spinbox_dialog)
 
         # Save the Data in Excel file 
-        self.ui.actionExportExcel.triggered.connect(data_in_excel_speichern)
+        data_speichern = self.output_file
+        self.ui.actionExportExcel.triggered.connect(self.data_in_excel_speichern)
 
         # Connect plot button with plot_data method
         self.plot_data()
@@ -287,6 +288,39 @@ class MainWindow(QMainWindow):
                 return [], [], [], [], 0, 0, 0
 
         return zeiten, yeinDaten, yausDaten, yanzMäuser,yTemperature,yLuft_F ,gesamtzahl, LuftFeuchtigkeit, Temp
+
+    def data_in_excel_speichern(self): 
+        # Erstellen eines QDialog
+        dialog = QDialog()
+        dialog.setWindowTitle("Daten in Excel Datei speichern")
+    
+        # Layout und Widgets für den Dialog
+        layout = QVBoxLayout()
+        message1 = QLabel("Von: dd.mm.yy")
+        layout.addWidget(message1)
+        first_date = QDateEdit()
+        first_date.setCalendarPopup(True)
+        layout.addWidget(first_date)
+        message2 = QLabel("Bis: dd.mm.yy")
+        layout.addWidget(message2)
+        last_date = QDateEdit()
+        last_date.setCalendarPopup(True)
+        layout.addWidget(last_date)
+        
+        # Hinzufügen von OK und Cancel Buttons
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(lambda: data_lesen_zeitraum(self.output_file,first_date, last_date, dialog))
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+
+        dialog.setLayout(layout)
+
+        # Anzeigen des Dialogs
+        if dialog.exec() == QDialog.Accepted:
+            print("Dialog akzeptiert")
+        else:
+            print("Dialog abgelehnt")
+
 
     def closeEvent(self, event):
         self.file_watcher.stop()

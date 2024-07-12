@@ -1,8 +1,9 @@
 import serial  # install with " pip3 install pyserial"
 import time
 import datetime
-from openpyxl import workbook
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit,QFileDialog, QMessageBox
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, PatternFill, Border, Side
+from PySide6.QtWidgets import QFileDialog, QMessageBox
 
 
 def file_writter(serial_port1, serial_port2, ser1, ser2, output_file): 
@@ -68,44 +69,13 @@ def data_lesen(lese_datei):
         except FileNotFoundError:
             print(f"Datei {lese_datei} nicht gefunden.")
             return []
-        
-
-def data_in_excel_speichern(lese_datei): 
-    # Erstellen eines QDialog
-    dialog = QDialog()
-    dialog.setWindowTitle("Daten in Excel Datei speichern")
-   
-    # Layout und Widgets für den Dialog
-    layout = QVBoxLayout()
-    message1 = QLabel("Von: DD.MM.YY")
-    layout.addWidget(message1)
-    first_date = QDateEdit()
-    first_date.setCalendarPopup(True)
-    layout.addWidget(first_date)
-    message2 = QLabel("Bis: DD.MM.YY")
-    layout.addWidget(message2)
-    last_date = QDateEdit()
-    last_date.setCalendarPopup(True)
-    layout.addWidget(last_date)
-    
-    # Hinzufügen von OK und Cancel Buttons
-    buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-    buttons.accepted.connect(lambda: data_lesen_zeitraum(lese_datei,first_date, last_date, dialog))
-    buttons.rejected.connect(dialog.reject)
-    layout.addWidget(buttons)
-
-    dialog.setLayout(layout)
-
-    # Anzeigen des Dialogs
-    if dialog.exec() == QDialog.Accepted:
-        print("Dialog akzeptiert")
-    else:
-        print("Dialog abgelehnt")
-
 
 def data_lesen_zeitraum(lese_datei,date1, date2, dialog):
     options = QFileDialog.Options()
     file_path, _ = QFileDialog.getSaveFileName(dialog, "Speichern unter", "", "Excel Dateien (*.xlsx);;Alle Dateien (*)", options=options)
+    date1_formated = date1.date().toPython()
+    date2_formated = date2.date().toPython()
+   
     
     if file_path:
         try:
@@ -113,16 +83,52 @@ def data_lesen_zeitraum(lese_datei,date1, date2, dialog):
             myData = data_lesen(lese_datei)  # Assuming data_lesen is a method in your class
             for line in myData: 
                 line_splited = line.split(",")
-                line_date = datetime.strptime(line_splited[0].split(" ")[0], "%d.%m.%Y").date()
-                if date1 <= line_date <= date2:
+                line_date = datetime.datetime.strptime(line_splited[0].split(" ")[0], "%d.%m.%Y").date()
+                if date1_formated <= line_date <= date2_formated:
                     data_fromTo.append(line_splited)
+                    
 
-            wb = workbook()
+            wb = Workbook()
             ws = wb.active
+            today = datetime.datetime.now().strftime("%d.%m.%Y")
+            title_document = ws.cell(row=3,column=6, value=(f"BATGUARD DATA: {today}"))
 
-            ws.append(['Datum', 'Einfluege', 'Ausfluege', 'Anz der Fledermause', 'Luftfeuchtigkeit', 'Temperature'])
-            for line in data_fromTo:
-                ws.append(line)
+            header_color = PatternFill(start_color="1E90FF", end_color="1E90FF", fill_type="solid")  # DodgerBlue3 color
+            cell_color = PatternFill(start_color="98F5FF", end_color="98F5FF", fill_type="solid")
+            
+            thin_border = Border(left=Side(style='thin', color='000000'),
+                                 right=Side(style='thin', color='000000'),
+                                 top=Side(style='thin', color='000000'),
+                                 bottom=Side(style='thin', color='000000'))
+            print("data_splited", data_fromTo)
+
+            headers = ['Datum','Uhrzeit','Einfluege', 'Ausfluege', 'Anz der Fledermause', 'Luftfeuchtigkeit', 'Temperature']
+
+            for col_index, header in enumerate( headers, start = 1):
+                cell = ws.cell(row= 5, column=col_index +2, value= header)
+                cell.alignment = Alignment(horizontal= "center", vertical="center")
+                cell.fill = header_color
+                cell.border = thin_border
+                if header =="Datum": 
+                    ws.column_dimensions[cell.column_letter].width = len(header) + 10
+                else: 
+                    ws.column_dimensions[cell.column_letter].width = len(header) + 5
+            
+            # Write data starting from row 6
+            start_row = 6
+            start_col = 3
+            for row_index, line in enumerate(data_fromTo, start=start_row):
+                cell_0 = ws.cell(row=row_index, column=start_col, value=line[0].split(" ")[0])
+                cell_1 = ws.cell(row=row_index, column=start_col + 1, value=line[0].split(" ")[1])
+                cell_2 = ws.cell(row=row_index, column=start_col + 2, value=int(line[1].strip().replace("->", "")))
+                cell_3 = ws.cell(row=row_index, column=start_col + 3, value=int(line[2].strip().replace("<-", "")))
+                cell_4 = ws.cell(row=row_index, column=start_col + 4, value=int(line[3].strip().replace("$", "")))
+                cell_5 = ws.cell(row=row_index, column=start_col + 5, value=float(line[4].strip().replace("%", "").replace(",", ".")))
+                cell_6 = ws.cell(row=row_index, column=start_col + 6, value=float(line[5].strip().replace("C", "").replace(",", ".")))
+                for cell in [cell_0, cell_1, cell_2, cell_3, cell_4, cell_5, cell_6]:
+                    cell.fill = cell_color
+                    cell.border = thin_border
+
 
             wb.save(file_path)
             QMessageBox.information(dialog, "Erfolg", f"Daten erfolgreich in '{file_path}' gespeichert")
