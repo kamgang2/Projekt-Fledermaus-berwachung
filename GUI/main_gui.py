@@ -122,7 +122,8 @@ class MainWindow(QMainWindow):
     
     def set_anz_fledermause(self, value):
         try: 
-            self.ser1.write(f"startwert_fleder: {value}".encode())
+            self.ser1.write(f"PY: {value}".encode())
+            print(f"startwert_fleder: {value}")
         except :
             print("Error with com port")
 
