@@ -86,10 +86,11 @@ def data_lesen_zeitraum(lese_datei,date1, date2, dialog):
             myData = data_lesen(lese_datei)  # Assuming data_lesen is a method in your class
             for line in myData: 
                 line_splited = line.split(",")
-                line_date = datetime.datetime.strptime(line_splited[0].split(" ")[0], "%d.%m.%Y").date()
-                if date1_formated <= line_date <= date2_formated:
-                    data_fromTo.append(line_splited)
-                    
+                if len(line_splited)>=6:
+                    line_date = datetime.datetime.strptime(line_splited[0].split(" ")[0], "%d.%m.%Y").date()
+                    if date1_formated <= line_date <= date2_formated:
+                        data_fromTo.append(line_splited)
+                        
 
             wb = Workbook()
             ws = wb.active
@@ -103,7 +104,7 @@ def data_lesen_zeitraum(lese_datei,date1, date2, dialog):
                                  right=Side(style='thin', color='000000'),
                                  top=Side(style='thin', color='000000'),
                                  bottom=Side(style='thin', color='000000'))
-            print("data_splited", data_fromTo)
+            #print("data_splited", data_fromTo)
 
             headers = ['Datum','Uhrzeit','Einfluege', 'Ausfluege', 'Anz der Fledermause', 'Luftfeuchtigkeit', 'Temperature']
 
