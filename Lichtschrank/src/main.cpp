@@ -50,6 +50,42 @@ unsigned long currentTime;
 unsigned long serialWriteTime;  // um alle 30 Sekunden die Fledermauszahl zu schreiben
 unsigned long previousSerialWriteTime;
 
+//Werte für CheckserialInput
+int extractedValue = 0;
+bool newData = false;
+
+
+//Diese Funktion überwacht die serielle Monitor und fang die Anfangsanzahl der Fledermauser ab: 
+void checkSerialInput() {
+  static byte ndx = 0;
+  char receivedChars[32];  // Buffer to store the received characters
+  const char startMarker = 'P';
+  const char endMarker = '\n';
+  char rc;
+  
+  while (Serial.available() > 0 && newData == false) {
+    rc = Serial.read();
+
+    if (rc != endMarker) {
+      receivedChars[ndx] = rc;
+      ndx++;
+      if (ndx >= sizeof(receivedChars)) {
+        ndx = sizeof(receivedChars) - 1;
+      }
+    }
+    else {
+      receivedChars[ndx] = '\0';  // Null-terminate the string
+      ndx = 0;
+      
+      // Check if the received string starts with "PY:"
+      if (strncmp(receivedChars, "PY:", 3) == 0) {
+        extractedValue = atoi(receivedChars + 3);  // Extract the integer value
+        newData = true;
+      }
+    }
+  }
+}
+
 double readAnalogVoltage(int analogInput) {
   int analogRawValue;
   double measuredVoltage;
@@ -496,6 +532,16 @@ void loop() {
     previousSerialWriteTime = millis();
   }
   // delay(5); // 5 ms warten
+
+  checkSerialInput();
+  if(newData)
+  {
+     Serial.print("Extracted value: ");
+     Serial.println(extractedValue);
+     Gesamtanzahl = extractedValue; 
+     //EEPROM.update(EEPROMAddr, extractedValue);
+     newData = false;  // Reset the flag
+  }
 }
 
 
