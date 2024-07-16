@@ -28,8 +28,9 @@ def timescaling(myfile,  sc_factor: scalefactor):
         lines = []
         groupedDate = {}
 
-        for line in myfile:     
-            lines.append(line.strip().split(","))
+        for line in myfile: 
+            line_splited = line.strip().split(",")  
+            lines.append(line_splited)
 
         for item in lines: 
                 date = item[0].split(" ")[0]
@@ -37,7 +38,7 @@ def timescaling(myfile,  sc_factor: scalefactor):
         
         if(sc_factor == scalefactor.Month): 
             for el in lines: 
-                key = el[0].split(".")[1]
+                key = el[0].split(".")[1]+ "."+ el[0].split(".")[2]
 
                 if key not in groupedDate: 
                     groupedDate[key] = []
@@ -45,7 +46,7 @@ def timescaling(myfile,  sc_factor: scalefactor):
 
         if(sc_factor == scalefactor.Day):
             for el in lines: 
-                key =  el[0].split(".")[0]+ "." + el[0].split(".")[1]
+                key =  el[0].split(".")[0]+ "."+ el[0].split(".")[1] + "." + el[0].split(".")[2]
                 if key not in groupedDate: 
                     groupedDate[key]=[]
                 groupedDate[key].append(el)
