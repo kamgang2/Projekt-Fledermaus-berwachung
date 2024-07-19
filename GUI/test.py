@@ -446,7 +446,7 @@ if __name__ == '__main__':
     updateViews()
     QtWidgets.QApplication.instance().exec()
 """
-
+"""
 import serial  # install with " pip3 install pyserial"
 import time
 import datetime
@@ -516,3 +516,35 @@ with open(output_file, 'a') as file:
         ser1.close()
         ser2.close()
         print(f"Disconnected from {serial_port1} and {serial_port2}.")   
+
+"""
+
+from PySide6.QtWidgets import QApplication, QMainWindow, QFrame, QVBoxLayout, QLCDNumber
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Create a frame to hold the QLCDNumber
+        self.frame = QFrame(self)
+        self.frame.setStyleSheet("""
+            border-radius: 49px;
+            background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #cacaca, stop:1 #f0f0f0);
+            box-shadow: 5px 5px 14px #c3c3c3, -5px -5px 14px #fdfdfd;
+        """)
+
+        # Create the QLCDNumber and set it as a child of the frame
+        self.lcdTemp = QLCDNumber(self.frame)
+        self.lcdTemp.display(1234)
+
+        # Create a layout to manage the frame's layout
+        layout = QVBoxLayout(self.frame)
+        layout.addWidget(self.lcdTemp)
+
+        self.setCentralWidget(self.frame)
+
+if __name__ == "__main__":
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    app.exec()

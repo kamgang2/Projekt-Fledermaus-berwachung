@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit
-from PySide6.QtGui import QPixmap, QActionGroup
+from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont
 from mainwindow import Ui_MainWindow  
 from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher
 from file_handler import file_writter, data_lesen, data_lesen_zeitraum
@@ -54,8 +54,14 @@ class MainWindow(QMainWindow):
             
 
         self.ui.setupUi(self)
-        self.ui.plotWidget1.setBackground('w')
-        self.ui.plotWidget2.setBackground('w')
+
+        # # Hintergrundfarbe als hexadezimale Zeichenkette
+        hex_color = "#E9F1FA"
+
+        # # Konvertieren Sie die hexadezimale Zeichenkette in ein QColor-Objekt
+        color = QColor(hex_color)
+        self.ui.plotWidget1.setBackground(color)
+        # self.ui.plotWidget2.setBackground('w')
 
         # Set segment style of QLCDNumber widget
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)

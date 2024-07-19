@@ -12,11 +12,11 @@ from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
+    QCursor, QFont, QFontDatabase, QGradient, 
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QGraphicsView, QLCDNumber, QLabel,
+from PySide6.QtWidgets import (QApplication, QGraphicsView, QLCDNumber, QLabel, QGraphicsDropShadowEffect,
     QMainWindow, QMenu, QMenuBar, QProgressBar, QSpinBox,QTabWidget,QVBoxLayout,
     QPushButton, QSizePolicy, QStatusBar, QWidget, QGridLayout, QScrollArea)
 import pyqtgraph as pg
@@ -26,6 +26,18 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(839, 600)
+  
+        # Laden der digitalen Schriftart
+        font_id = QFontDatabase.addApplicationFont("digital-7.ttf")
+        if font_id == -1:
+            print("Schriftart konnte nicht geladen werden!")
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        digital_font = QFont(font_family, 24)
+
+        """Couleurs utilisées : Bleu clair (#E9F1FA), bleu vif (#00ABE4), blanc (#FFFFFF)"""
+        # Set background color of the main window
+        MainWindow.setStyleSheet("background-color: #E9F1FA;")  # Change this color as needed
+
         
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -44,6 +56,9 @@ class Ui_MainWindow(object):
         self.plotWidget1.setObjectName(u"plotWidget1")
         self.tab1Layout.addWidget(self.plotWidget1)
         self.tabWidget.addTab(self.tab1, "Fluege")
+        self.tabWidget.setStyleSheet("""
+            background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
+        """)
         
         self.tab2 = QWidget()
         self.tab2.setObjectName(u"tab2")
@@ -58,7 +73,12 @@ class Ui_MainWindow(object):
         
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 17, 1)
         
-
+        # Create and set the drop shadow effect
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(14)
+        shadow.setXOffset(5)
+        shadow.setYOffset(5)
+        shadow.setColor(QColor(20, 35,222))
         
         
         # Temperatur LCD
@@ -68,11 +88,17 @@ class Ui_MainWindow(object):
         self.lcdTemp.setSmallDecimalPoint(False)
         self.lcdTemp.setMode(QLCDNumber.Mode.Dec)
         self.lcdTemp.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
+        self.lcdTemp.setStyleSheet("""
+                                    background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
+                                    """) 
+       
+        self.lcdTemp.setGraphicsEffect(shadow)
         self.gridLayout.addWidget(self.lcdTemp, 0, 1, 3,1)
 
         # Temperatur Label
         self.TempLabel = QLabel(self.centralwidget)
         self.TempLabel.setObjectName(u"TempLabel")
+        self.TempLabel.setFont(digital_font)
         self.TempLabel.setAlignment(Qt.AlignCenter)
         self.gridLayout.addWidget(self.TempLabel, 3, 1)
 
@@ -85,6 +111,10 @@ class Ui_MainWindow(object):
         self.lcdLuft.setSmallDecimalPoint(False)
         self.lcdLuft.setMode(QLCDNumber.Mode.Dec)
         self.lcdLuft.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
+        self.lcdLuft.setStyleSheet("""
+                                    background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
+                                    """)
+        #self.lcdLuft.setGraphicsEffect(shadow)
         self.gridLayout.addWidget(self.lcdLuft, 6, 1,3,1)
 
         # Luftfeuchtigkeit Label
@@ -107,6 +137,9 @@ class Ui_MainWindow(object):
         self.lcdGesamtzahl.setSmallDecimalPoint(False)
         self.lcdGesamtzahl.setMode(QLCDNumber.Mode.Dec)
         self.lcdGesamtzahl.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
+        self.lcdGesamtzahl.setStyleSheet("""
+                                    background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
+                                    """)
         self.gridLayout.addWidget(self.lcdGesamtzahl, 12, 1,3,1)
 
         # Gesamtzahl Label
