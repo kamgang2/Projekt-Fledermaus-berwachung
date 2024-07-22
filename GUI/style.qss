@@ -1,8 +1,7 @@
 QMainWindow{
-    background-color:whitesmoke
+    background-color: #E9F1FA
     
 }
-
 
 QLCDNumber {
     color: rgb(0, 0, 0);
@@ -112,4 +111,16 @@ QPushButton {
 
 QPushButton:hover {
     background-color: #00509E;
+}
+
+#actionSetAnzFledermause{
+    font-family: 'digital-7'; /* Schriftartname */
+    font-size: 16px; /* Schriftgröße */
+
+}
+
+QProgressBar {
+    border: 2px solid #000000; /* Rahmenfarbe */
+    border-radius: 5px; /* Abgerundete Ecken */
+   
 }

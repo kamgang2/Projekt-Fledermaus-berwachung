@@ -176,8 +176,11 @@ class MainWindow(QMainWindow):
         time_to_index = {t: i for i, t in enumerate(self.zeiten)}
         indices = [time_to_index[t] for t in self.zeiten]
 
-        # self.ui.plotWidget1.clear()
-        # self.ui.plotWidget1.addLegend()
+        # Clear existing plots and add legends
+        self.ui.plotWidget1.clear()
+        self.ui.plotWidget2.clear()
+        self.ui.plotWidget1.addLegend()
+        self.ui.plotWidget2.addLegend()
 
         # Define pens with different thickness
         pen_ein = {'color': 'g', 'width': 3}  # Thickness for 'Einfluege'
@@ -190,11 +193,6 @@ class MainWindow(QMainWindow):
         self.ui.plotWidget1.plot(indices, self.yausDaten, pen=pen_aus, name='Ausfluege')
         self.ui.plotWidget1.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
 
-        # Set labels and title
-        #self.ui.plotWidget1.setLabel('left', 'Werte')
-        #self.ui.plotWidget1.setLabel('bottom', 'Zeit')
-        #self.ui.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
-
         # Use CustomAxisItem to correctly display custom labels on the x-axis
         date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
         custom_axis = CustomAxisItem(labels=date_labels, orientation='bottom')
@@ -206,7 +204,10 @@ class MainWindow(QMainWindow):
         p2.setXLink(p1)
 
         p1.plot(indices, self.yTemp, pen=pen_temp, name='Temperature (°C)')
-        p2.addItem(pg.PlotDataItem(indices, self.yLuft, pen=pen_luft, name="Luftfeuchtigkeit (%)"))
+        # Plot data on the secondary view (p2) and add to the legend of plotWidget2
+        temp_curve = pg.PlotDataItem(indices, self.yLuft, pen=pen_luft, name="Luftfeuchtigkeit (%)")
+        p2.addItem(temp_curve)
+       # self.ui.plotWidget2.addItem(temp_curve)
 
         def updateViews():
             p2.setGeometry(p1.getViewBox().sceneBoundingRect())

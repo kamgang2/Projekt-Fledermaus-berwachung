@@ -26,6 +26,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(839, 600)
+        MainWindow.setWindowTitle("FledermausTracker")
 
         
         # Schriftart laden
@@ -71,7 +72,7 @@ class Ui_MainWindow(object):
 
         self.plotWidget1.setObjectName(u"plotWidget1")
         self.tab1Layout.addWidget(self.plotWidget1)
-        self.tabWidget.addTab(self.tab1, "Fluege")
+        self.tabWidget.addTab(self.tab1, "Fledermausaktivität")
         
         
         self.tab2 = QWidget()
@@ -80,12 +81,12 @@ class Ui_MainWindow(object):
         self.plotWidget2 = pg.PlotWidget(self.tab2)
         self.viewBox = pg.ViewBox()
         self.plotWidget2.scene().addItem(self.viewBox)
-        self.plotWidget2.setLabel('left', 'Temperatur in °C', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'red'})
+        self.plotWidget2.setLabel('left', 'TEMPERATUR in °C', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'red'})
         self.plotWidget2.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'digital-7'})
-        self.plotWidget2.getAxis('right').setLabel('LUFTFEUCHTIGKEIT', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'blue'})
+        self.plotWidget2.getAxis('right').setLabel('LUFTFEUCHTIGKEIT in %', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'blue'})
         self.plotWidget2.setObjectName(u"plotWidget2")
         self.tab2Layout.addWidget(self.plotWidget2)
-        self.tabWidget.addTab(self.tab2, "Umgebungsvariablen")
+        self.tabWidget.addTab(self.tab2, "Umweltmessungen")
 
         
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 17, 1)
@@ -137,6 +138,7 @@ class Ui_MainWindow(object):
         # Luftfeuchtigkeit Fortschrittsbalken
         self.LuftProgessBar = QProgressBar(self.centralwidget)
         self.LuftProgessBar.setObjectName(u"LuftProgessBar")
+        self.LuftProgessBar.setTextVisible(True)
         self.LuftProgessBar.setRange(0, 100)
         self.LuftProgessBar.setOrientation(Qt.Vertical)
         self.gridLayout.addWidget(self.LuftProgessBar, 6, 2, 3, 1)
@@ -167,17 +169,17 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         MainWindow.setMenuBar(self.menubar)
-        self.menuDatei = QMenu(self.menubar)
+        self.menuDatei = QMenu(u"Datei",self.menubar)
+        self.menuDatei.setIcon(QIcon("icons/menu-burger.png"))
 
-        self.menuDatei.setObjectName(u"menuDatei")
-        self.actionExportExcel = QAction("als Excel exportieren", MainWindow)
+        self.menuDatei.setObjectName( u"menuDatei")
+        self.actionExportExcel = QAction(QIcon("icons/file-xls.png"), u"als Excel exportieren", MainWindow)
         self.menuDatei.addAction(self.actionExportExcel)
-        self.menuAnsicht = QMenu(self.menubar)
 
+        self.menuAnsicht = QMenu(self.menubar)
         self.menuAnsicht.setObjectName(u"menuAnsicht")
         self.actionTag = QAction("Tag", MainWindow)
         self.actionNormal = QAction("Normal", MainWindow)
-        # self.actionWochen = QAction("Wochen", MainWindow)
         self.actionMonat = QAction("Monat", MainWindow)
         self.menuAnsicht.addAction(self.actionNormal)
         self.menuAnsicht.addAction(self.actionTag)
@@ -185,7 +187,7 @@ class Ui_MainWindow(object):
         self.menuAnsicht.addAction(self.actionMonat)
 
         self.menuEinstellung = QMenu(u"Eintsellung")
-        self.actionSetAnzFledermause = QAction("Set Anz der Fledermause", MainWindow)
+        self.actionSetAnzFledermause = QAction(QIcon("icons/settings.png"), "Set Anz der Fledermause", MainWindow)
         self.menuEinstellung.addAction(self.actionSetAnzFledermause)
      
 
