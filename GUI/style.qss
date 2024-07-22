@@ -1,0 +1,115 @@
+QMainWindow{
+    background-color:whitesmoke
+    
+}
+
+
+QLCDNumber {
+    color: rgb(0, 0, 0);
+    border-radius: 16px;
+    background: #00ABE4;
+
+    
+    /*box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;  */
+}
+
+QLabel{
+    font-family: 'digital-7'; /* Schriftartname */
+    font-size: 16px; /* Schriftgröße */
+}
+
+/* Style für das QTabWidget */
+QTabWidget::pane {
+    border: 2px solid #00ABE4; /* Rand des Tab-Widgets */
+    border-radius: 16px; /* Ecken des gesamten Tab-Widgets */
+    padding: 5px; /* Abstand zwischen Rand und Inhalt */
+    font-family: 'digital-z'; /* Schriftartname */
+    font-size: 16px; 
+}
+
+QTabBar::tab {
+    background: #E9F1FA; /* Hintergrund der Tabs */
+    border: 1px solid #00ABE4; /* Rand der einzelnen Tabs */
+    border-radius: 10px; /* Ecken der einzelnen Tabs */
+    padding: 10px; /* Innenabstand der Tabs */
+    min-width: 100px; /* Mindestbreite der Tabs */
+    font-family: 'digital-7'; /* Schriftartname */
+    font-size: 20px; 
+}
+
+QTabBar::tab:selected {
+    background: #00ABE4; /* Hintergrund der ausgewählten Tab */
+    color: white; /* Textfarbe der ausgewählten Tab */
+}
+
+QTabBar::tab:hover {
+    background: #D0E8F3; /* Hintergrund der Tabs bei Hover */
+}
+
+
+
+/* Schriftart und Stil für die Menüleiste */
+QMenuBar {
+    font-family: 'digital-7';  /* Ersetze durch den Namen deiner Schriftart */
+    font-size: 14pt;
+    background: #00ABE4;  /* Hintergrundfarbe der Menüleiste */
+    color: #FFFFFF;  /* Textfarbe */
+    border: none;  /* Entfernt den Rahmen, falls gewünscht */
+}
+
+/* Schriftart und Stil für die Menüs */
+QMenu {
+    font-family: 'digital-7';  /* Ersetze durch den Namen deiner Schriftart */
+    font-size: 14pt;
+    background: #00ABE4;  /* Hintergrundfarbe der Menüs */
+    color: #FFFFFF;  /* Textfarbe */
+    border: 2px solid #00ABE4;  /* Rahmen um das Menü */
+    border-radius: 10px;  /* Abgerundete Ecken */
+}
+
+/* Schriftart und Stil für die Menüeinträge */
+QMenu::item {
+    font-family: 'digital-7';  /* Ersetze durch den Namen deiner Schriftart */
+    font-size: 14pt;
+    padding: 5px 10px;  /* Padding für die Menüeinträge */
+    border-radius: 10px;  /* Abgerundete Ecken */
+}
+
+/* Stil für Menüeinträge im Hover-Zustand */
+QMenu::item:selected {
+    background: #007ACC;  /* Hintergrundfarbe beim Hover */
+    color: #FFFFFF;  /* Textfarbe beim Hover */
+}
+
+
+QDialog {
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    font-family: 'Arial';
+    font-size: 14px;
+}
+
+QLabel {
+    color: #333333;
+}
+
+QSpinBox {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 2px;
+    font-family: 'digital-7';
+}
+
+QPushButton {
+    background-color: #007ACC;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-family: 'digital-7';
+    font-size: 16px;
+}
+
+QPushButton:hover {
+    background-color: #00509E;
+}

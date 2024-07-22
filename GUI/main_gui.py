@@ -56,12 +56,12 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # # Hintergrundfarbe als hexadezimale Zeichenkette
-        hex_color = "#E9F1FA"
+        # hex_color = "#E9F1FA"
 
-        # # Konvertieren Sie die hexadezimale Zeichenkette in ein QColor-Objekt
-        color = QColor(hex_color)
-        self.ui.plotWidget1.setBackground(color)
-        # self.ui.plotWidget2.setBackground('w')
+        # # # Konvertieren Sie die hexadezimale Zeichenkette in ein QColor-Objekt
+        # color = QColor(hex_color)
+        self.ui.plotWidget1.setBackground('w')
+        self.ui.plotWidget2.setBackground('w')
 
         # Set segment style of QLCDNumber widget
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
@@ -191,9 +191,9 @@ class MainWindow(QMainWindow):
         self.ui.plotWidget1.plot(indices, self.yanzMäuser, pen=pen_anz, name='Anz Fledermaeuser')
 
         # Set labels and title
-        self.ui.plotWidget1.setLabel('left', 'Werte')
-        self.ui.plotWidget1.setLabel('bottom', 'Zeit')
-        self.ui.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
+        #self.ui.plotWidget1.setLabel('left', 'Werte')
+        #self.ui.plotWidget1.setLabel('bottom', 'Zeit')
+        #self.ui.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
 
         # Use CustomAxisItem to correctly display custom labels on the x-axis
         date_labels = {i: str(t) for i, t in enumerate(self.zeiten)}
@@ -213,11 +213,11 @@ class MainWindow(QMainWindow):
             p2.linkedViewChanged(p1.getViewBox(), p2.XAxis)
 
         p1.getViewBox().sigResized.connect(updateViews)
-        p1.setLabel('bottom', 'Zeit')
-        p1.setLabel('left', 'Temperatur (°C)')
+        #p1.setLabel('bottom', 'Zeit')
+        #p1.setLabel('left', 'Temperatur (°C)')
         p1.setTitle('Temperature und Luftfeuchtigkeit über die Zeit')
         p1.setYRange(-10, 50, padding=0)
-        p1.getAxis('right').setLabel('Luftfeuchtigkeit (%)', color='blue')
+        #p1.getAxis('right').setLabel('Luftfeuchtigkeit (%)', color='blue')
         p2.setYRange(0, 100, padding=0)
         
         # Use CustomAxisItem to correctly display custom labels on the x-axis for plotWidget2
@@ -303,10 +303,15 @@ class MainWindow(QMainWindow):
 
         return zeiten, yeinDaten, yausDaten, yanzMäuser,yTemperature,yLuft_F ,gesamtzahl, LuftFeuchtigkeit, Temp
 
-    def data_in_excel_speichern(self): 
+    def data_in_excel_speichern(self):
+
         # Erstellen eines QDialog
         dialog = QDialog()
         dialog.setWindowTitle("Daten in Excel Datei speichern")
+
+          # Load and apply the stylesheet
+        with open('style.qss', 'r') as file:
+            dialog.setStyleSheet(file.read())
     
         # Layout und Widgets für den Dialog
         layout = QVBoxLayout()

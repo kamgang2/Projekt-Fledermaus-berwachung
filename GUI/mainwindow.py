@@ -10,7 +10,7 @@
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+    QSize, QTime, QUrl, Qt, QFile, QTextStream)
 from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QCursor, QFont, QFontDatabase, QGradient, 
     QIcon, QImage, QKeySequence, QLinearGradient,
@@ -26,17 +26,26 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(839, 600)
-  
-        # Laden der digitalen Schriftart
-        font_id = QFontDatabase.addApplicationFont("digital-7.ttf")
+
+        
+        # Schriftart laden
+        font_id = QFontDatabase.addApplicationFont("digital_7/digital-7.ttf")
         if font_id == -1:
             print("Schriftart konnte nicht geladen werden!")
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        digital_font = QFont(font_family, 24)
+        #self.digital_font = QFont(font_family, 24)  # Schriftgröße 24
+  
+      # Lade das Stylesheet aus einer Datei
+        file = QFile("style.qss")
+        if file.open(QFile.ReadOnly | QFile.Text):
+            stream = QTextStream(file)
+            stylesheet = stream.readAll()
+            MainWindow.setStyleSheet(stylesheet)
+            file.close()
 
         """Couleurs utilisées : Bleu clair (#E9F1FA), bleu vif (#00ABE4), blanc (#FFFFFF)"""
         # Set background color of the main window
-        MainWindow.setStyleSheet("background-color: #E9F1FA;")  # Change this color as needed
+        #MainWindow.setStyleSheet("background-color: #E9F1FA;")  # Change this color as needed
 
         
         self.centralwidget = QWidget(MainWindow)
@@ -53,12 +62,17 @@ class Ui_MainWindow(object):
         self.tab1.setObjectName(u"tab1")
         self.tab1Layout = QVBoxLayout(self.tab1)  # Layout für tab1
         self.plotWidget1 = pg.PlotWidget(self.tab1)
+        self.plotWidget1.setLabel('left', 'WERTE', **{'font-size': '14pt', 'font-family': 'digital-7'})
+        self.plotWidget1.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'digital-7'})
+        self.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
+         # Schriftart für Titel anpassen
+        title_font = QFont(font_family, 14)  # 'Digital-7' ist die Schriftart, 14pt ist die Schriftgröße
+        self.plotWidget1.getPlotItem().setTitle('Ein- und Aus-Fluege über die Zeit', color='black', size='14pt', font=title_font)
+
         self.plotWidget1.setObjectName(u"plotWidget1")
         self.tab1Layout.addWidget(self.plotWidget1)
         self.tabWidget.addTab(self.tab1, "Fluege")
-        self.tabWidget.setStyleSheet("""
-            background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
-        """)
+        
         
         self.tab2 = QWidget()
         self.tab2.setObjectName(u"tab2")
@@ -66,6 +80,9 @@ class Ui_MainWindow(object):
         self.plotWidget2 = pg.PlotWidget(self.tab2)
         self.viewBox = pg.ViewBox()
         self.plotWidget2.scene().addItem(self.viewBox)
+        self.plotWidget2.setLabel('left', 'Temperatur in °C', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'red'})
+        self.plotWidget2.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'digital-7'})
+        self.plotWidget2.getAxis('right').setLabel('LUFTFEUCHTIGKEIT', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'blue'})
         self.plotWidget2.setObjectName(u"plotWidget2")
         self.tab2Layout.addWidget(self.plotWidget2)
         self.tabWidget.addTab(self.tab2, "Umgebungsvariablen")
@@ -84,13 +101,11 @@ class Ui_MainWindow(object):
         # Temperatur LCD
         self.lcdTemp = QLCDNumber(self.centralwidget)
         self.lcdTemp.setObjectName(u"lcdTemp")
-        self.lcdTemp.setStyleSheet(u"color: skyblue")
+        self.lcdTemp.setStyleSheet(u"color: black")
         self.lcdTemp.setSmallDecimalPoint(False)
         self.lcdTemp.setMode(QLCDNumber.Mode.Dec)
         self.lcdTemp.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
-        self.lcdTemp.setStyleSheet("""
-                                    background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
-                                    """) 
+        
        
         self.lcdTemp.setGraphicsEffect(shadow)
         self.gridLayout.addWidget(self.lcdTemp, 0, 1, 3,1)
@@ -98,7 +113,7 @@ class Ui_MainWindow(object):
         # Temperatur Label
         self.TempLabel = QLabel(self.centralwidget)
         self.TempLabel.setObjectName(u"TempLabel")
-        self.TempLabel.setFont(digital_font)
+       # self.TempLabel.setFont(digital_font)
         self.TempLabel.setAlignment(Qt.AlignCenter)
         self.gridLayout.addWidget(self.TempLabel, 3, 1)
 
@@ -107,14 +122,10 @@ class Ui_MainWindow(object):
         # Luftfeuchtigkeit LCD
         self.lcdLuft = QLCDNumber(self.centralwidget)
         self.lcdLuft.setObjectName(u"lcdLuft")
-        self.lcdLuft.setStyleSheet(u"color: skyblue")
+        self.lcdLuft.setStyleSheet(u"color: black")
         self.lcdLuft.setSmallDecimalPoint(False)
         self.lcdLuft.setMode(QLCDNumber.Mode.Dec)
         self.lcdLuft.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
-        self.lcdLuft.setStyleSheet("""
-                                    background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
-                                    """)
-        #self.lcdLuft.setGraphicsEffect(shadow)
         self.gridLayout.addWidget(self.lcdLuft, 6, 1,3,1)
 
         # Luftfeuchtigkeit Label
@@ -133,13 +144,10 @@ class Ui_MainWindow(object):
         # Gesamtzahl LCD
         self.lcdGesamtzahl = QLCDNumber(self.centralwidget)
         self.lcdGesamtzahl.setObjectName(u"lcdGesamtzahl")
-        self.lcdGesamtzahl.setStyleSheet(u"color: skyblue")
+        self.lcdGesamtzahl.setStyleSheet(u"color: black")
         self.lcdGesamtzahl.setSmallDecimalPoint(False)
         self.lcdGesamtzahl.setMode(QLCDNumber.Mode.Dec)
         self.lcdGesamtzahl.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
-        self.lcdGesamtzahl.setStyleSheet("""
-                                    background: qlineargradient(spread:pad, x1:0.2, y1:0, x2:0.4, y2:0.9, stop:0 #00ABE4, stop:1 #f0f0f0);
-                                    """)
         self.gridLayout.addWidget(self.lcdGesamtzahl, 12, 1,3,1)
 
         # Gesamtzahl Label
@@ -204,4 +212,5 @@ class Ui_MainWindow(object):
         self.plotButton.setText(QCoreApplication.translate("MainWindow", u"Plot Data", None))
         self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Datei", None))
         self.menuAnsicht.setTitle(QCoreApplication.translate("MainWindow", u"Ansicht", None))
+        self.actionSetAnzFledermause.setText(QCoreApplication.translate("MainWindow", u"Set Anz der Fledermause", None))
 

@@ -159,6 +159,9 @@ class SpinBoxDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Anzahl der Fledermauser")
+        # Load and apply the stylesheet
+        with open('style.qss', 'r') as file:
+            self.setStyleSheet(file.read())
 
         self.layout = QVBoxLayout(self)
 
