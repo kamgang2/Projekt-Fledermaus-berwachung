@@ -13,7 +13,7 @@ QLCDNumber {
 }
 
 QLabel{
-    font-family: 'digital-7'; /* Schriftartname */
+    font-family: 'Arial'; /* Schriftartname */
     font-size: 16px; /* Schriftgröße */
 }
 
@@ -22,7 +22,7 @@ QTabWidget::pane {
     border: 2px solid #00ABE4; /* Rand des Tab-Widgets */
     border-radius: 16px; /* Ecken des gesamten Tab-Widgets */
     padding: 5px; /* Abstand zwischen Rand und Inhalt */
-    font-family: 'digital-z'; /* Schriftartname */
+    font-family: 'Arial'; /* Schriftartname */
     font-size: 16px; 
 }
 
@@ -32,7 +32,7 @@ QTabBar::tab {
     border-radius: 10px; /* Ecken der einzelnen Tabs */
     padding: 10px; /* Innenabstand der Tabs */
     min-width: 100px; /* Mindestbreite der Tabs */
-    font-family: 'digital-7'; /* Schriftartname */
+    font-family: 'Arial'; /* Schriftartname */
     font-size: 20px; 
 }
 
@@ -49,7 +49,7 @@ QTabBar::tab:hover {
 
 /* Schriftart und Stil für die Menüleiste */
 QMenuBar {
-    font-family: 'digital-7';  /* Ersetze durch den Namen deiner Schriftart */
+    font-family: 'Arial';  /* Ersetze durch den Namen deiner Schriftart */
     font-size: 14pt;
     background: #00ABE4;  /* Hintergrundfarbe der Menüleiste */
     color: #FFFFFF;  /* Textfarbe */
@@ -58,7 +58,7 @@ QMenuBar {
 
 /* Schriftart und Stil für die Menüs */
 QMenu {
-    font-family: 'digital-7';  /* Ersetze durch den Namen deiner Schriftart */
+    font-family: 'Arial';  /* Ersetze durch den Namen deiner Schriftart */
     font-size: 14pt;
     background: #00ABE4;  /* Hintergrundfarbe der Menüs */
     color: #FFFFFF;  /* Textfarbe */
@@ -68,7 +68,7 @@ QMenu {
 
 /* Schriftart und Stil für die Menüeinträge */
 QMenu::item {
-    font-family: 'digital-7';  /* Ersetze durch den Namen deiner Schriftart */
+    font-family: 'Arial';  /* Ersetze durch den Namen deiner Schriftart */
     font-size: 14pt;
     padding: 5px 10px;  /* Padding für die Menüeinträge */
     border-radius: 10px;  /* Abgerundete Ecken */
@@ -96,7 +96,7 @@ QSpinBox {
     border: 1px solid #cccccc;
     border-radius: 5px;
     padding: 2px;
-    font-family: 'digital-7';
+    font-family: 'Arial';
 }
 
 QPushButton {
@@ -105,7 +105,7 @@ QPushButton {
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
-    font-family: 'digital-7';
+    font-family: 'Arial';
     font-size: 16px;
 }
 
@@ -114,13 +114,8 @@ QPushButton:hover {
 }
 
 #actionSetAnzFledermause{
-    font-family: 'digital-7'; /* Schriftartname */
+    font-family: 'Arial'; /* Schriftartname */
     font-size: 16px; /* Schriftgröße */
 
 }
 
-QProgressBar {
-    border: 2px solid #000000; /* Rahmenfarbe */
-    border-radius: 5px; /* Abgerundete Ecken */
-   
-}

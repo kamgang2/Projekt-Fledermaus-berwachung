@@ -26,7 +26,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(839, 600)
-        MainWindow.setWindowTitle("FledermausTracker")
+    
 
         
         # Schriftart laden
@@ -63,7 +63,7 @@ class Ui_MainWindow(object):
         self.tab1.setObjectName(u"tab1")
         self.tab1Layout = QVBoxLayout(self.tab1)  # Layout für tab1
         self.plotWidget1 = pg.PlotWidget(self.tab1)
-        self.plotWidget1.setLabel('left', 'WERTE', **{'font-size': '14pt', 'font-family': 'digital-7'})
+        self.plotWidget1.setLabel('left', 'WERTE', **{'font-size': '14pt', 'font-family': 'arial'})
         self.plotWidget1.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'digital-7'})
         self.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
          # Schriftart für Titel anpassen
@@ -179,7 +179,7 @@ class Ui_MainWindow(object):
         self.menuAnsicht = QMenu(self.menubar)
         self.menuAnsicht.setObjectName(u"menuAnsicht")
         self.actionTag = QAction("Tag", MainWindow)
-        self.actionNormal = QAction("Normal", MainWindow)
+        self.actionNormal = QAction("Stunden", MainWindow)
         self.actionMonat = QAction("Monat", MainWindow)
         self.menuAnsicht.addAction(self.actionNormal)
         self.menuAnsicht.addAction(self.actionTag)
@@ -207,7 +207,7 @@ class Ui_MainWindow(object):
         QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+       # MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.TempLabel.setText(QCoreApplication.translate("MainWindow", u"Temperature in \u00b0C", None))
         self.LuftLabel.setText(QCoreApplication.translate("MainWindow", u"Luftfeuchtigkeit in %", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Anzahl der Fledermäuse", None))

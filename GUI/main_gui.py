@@ -32,6 +32,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.lock = threading.Lock() 
+        self.setWindowTitle("FLEDERMAUSTRACKER")
 
        # Configure the serial port and the baud rate
         self.serial_port1 = 'COM4'  # Replace with your serial port
@@ -236,7 +237,19 @@ class MainWindow(QMainWindow):
         # Display humidity
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
         self.ui.LuftProgessBar.setValue(LuftFeuchtigkeit)
+        self.ui.LuftProgessBar.setStyleSheet("""
+            QProgressBar {
+                
+                border: 1px solid grey;   /* Rahmen um die ProgressBar */
+                border-radius: 5px;       /* Abgerundete Ecken */
+                text-align: center;       /* Text zentrieren */
+            }
 
+            QProgressBar::chunk {
+                background-color: skyblue; /* Hintergrund der Fortschrittsanzeige */
+                width: 20px;               /* Breite des Fortschrittsbalkens */
+            }
+        """)
         # Explicitly redraw the widgets
         self.ui.plotWidget1.repaint()
         self.ui.plotWidget2.repaint()
@@ -361,6 +374,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
+    #window.setWindowTitle("FledermausTracker",  **{'font-size': '14pt', 'font-family': 'digital-7'})
    # window.start_fileWritter()
     window.show()
     sys.exit(app.exec())
