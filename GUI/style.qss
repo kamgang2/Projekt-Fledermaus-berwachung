@@ -119,3 +119,9 @@ QPushButton:hover {
 
 }
 
+QProgressBar {
+   
+    border: 1px solid grey;   /* Rahmen um die ProgressBar */
+    border-radius: 5px;       /* Abgerundete Ecken */
+    text-align: center;       /* Text zentrieren */
+}

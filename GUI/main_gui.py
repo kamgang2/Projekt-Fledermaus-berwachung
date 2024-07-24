@@ -237,19 +237,7 @@ class MainWindow(QMainWindow):
         # Display humidity
         self.ui.lcdLuft.display(LuftFeuchtigkeit)
         self.ui.LuftProgessBar.setValue(LuftFeuchtigkeit)
-        self.ui.LuftProgessBar.setStyleSheet("""
-            QProgressBar {
-                
-                border: 1px solid grey;   /* Rahmen um die ProgressBar */
-                border-radius: 5px;       /* Abgerundete Ecken */
-                text-align: center;       /* Text zentrieren */
-            }
-
-            QProgressBar::chunk {
-                background-color: skyblue; /* Hintergrund der Fortschrittsanzeige */
-                width: 20px;               /* Breite des Fortschrittsbalkens */
-            }
-        """)
+        self.ui.LuftProgessBar.setStyleSheet("QProgressBar::chunk {background-color: #00ABE4; }")
         # Explicitly redraw the widgets
         self.ui.plotWidget1.repaint()
         self.ui.plotWidget2.repaint()

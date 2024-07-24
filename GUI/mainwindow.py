@@ -29,12 +29,12 @@ class Ui_MainWindow(object):
     
 
         
-        # Schriftart laden
-        font_id = QFontDatabase.addApplicationFont("digital_7/digital-7.ttf")
-        if font_id == -1:
-            print("Schriftart konnte nicht geladen werden!")
-        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        #self.digital_font = QFont(font_family, 24)  # Schriftgröße 24
+        # # Schriftart laden
+        # font_id = QFontDatabase.addApplicationFont("Arial/Arial.ttf")
+        # if font_id == -1:
+        #     print("Schriftart konnte nicht geladen werden!")
+        # font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        # #self.Arialont = QFont(font_family, 24)  # Schriftgröße 24
   
       # Lade das Stylesheet aus einer Datei
         file = QFile("style.qss")
@@ -64,10 +64,10 @@ class Ui_MainWindow(object):
         self.tab1Layout = QVBoxLayout(self.tab1)  # Layout für tab1
         self.plotWidget1 = pg.PlotWidget(self.tab1)
         self.plotWidget1.setLabel('left', 'WERTE', **{'font-size': '14pt', 'font-family': 'arial'})
-        self.plotWidget1.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'digital-7'})
+        self.plotWidget1.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'Arial'})
         self.plotWidget1.setTitle('Ein- und Aus-Fluege über die Zeit')
          # Schriftart für Titel anpassen
-        title_font = QFont(font_family, 14)  # 'Digital-7' ist die Schriftart, 14pt ist die Schriftgröße
+        title_font = QFont('Arial', 14)  # 'Arial' ist die Schriftart, 14pt ist die Schriftgröße
         self.plotWidget1.getPlotItem().setTitle('Ein- und Aus-Fluege über die Zeit', color='black', size='14pt', font=title_font)
 
         self.plotWidget1.setObjectName(u"plotWidget1")
@@ -81,9 +81,9 @@ class Ui_MainWindow(object):
         self.plotWidget2 = pg.PlotWidget(self.tab2)
         self.viewBox = pg.ViewBox()
         self.plotWidget2.scene().addItem(self.viewBox)
-        self.plotWidget2.setLabel('left', 'TEMPERATUR in °C', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'red'})
-        self.plotWidget2.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'digital-7'})
-        self.plotWidget2.getAxis('right').setLabel('LUFTFEUCHTIGKEIT in %', **{'font-size': '14pt', 'font-family': 'digital-7', 'color': 'blue'})
+        self.plotWidget2.setLabel('left', 'TEMPERATUR in °C', **{'font-size': '14pt', 'font-family': 'Arial', 'color': 'red'})
+        self.plotWidget2.setLabel('bottom', 'Zeit', **{'font-size': '14pt', 'font-family': 'Arial'})
+        self.plotWidget2.getAxis('right').setLabel('LUFTFEUCHTIGKEIT in %', **{'font-size': '14pt', 'font-family': 'Arial', 'color': 'blue'})
         self.plotWidget2.setObjectName(u"plotWidget2")
         self.tab2Layout.addWidget(self.plotWidget2)
         self.tabWidget.addTab(self.tab2, "Umweltmessungen")
@@ -114,7 +114,7 @@ class Ui_MainWindow(object):
         # Temperatur Label
         self.TempLabel = QLabel(self.centralwidget)
         self.TempLabel.setObjectName(u"TempLabel")
-       # self.TempLabel.setFont(digital_font)
+       # self.TempLabel.setFont(Arialont)
         self.TempLabel.setAlignment(Qt.AlignCenter)
         self.gridLayout.addWidget(self.TempLabel, 3, 1)
 
@@ -159,9 +159,9 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.label, 15, 1)
 
         # Plot Button
-        self.plotButton = QPushButton(self.centralwidget)
-        self.plotButton.setObjectName(u"plotButton")
-        self.gridLayout.addWidget(self.plotButton, 16, 1, 1, 2)
+        # self.plotButton = QPushButton(self.centralwidget)
+        # self.plotButton.setObjectName(u"plotButton")
+        # self.gridLayout.addWidget(self.plotButton, 16, 1, 1, 2)
 
         MainWindow.setCentralWidget(self.centralwidget)
          
@@ -211,7 +211,7 @@ class Ui_MainWindow(object):
         self.TempLabel.setText(QCoreApplication.translate("MainWindow", u"Temperature in \u00b0C", None))
         self.LuftLabel.setText(QCoreApplication.translate("MainWindow", u"Luftfeuchtigkeit in %", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Anzahl der Fledermäuse", None))
-        self.plotButton.setText(QCoreApplication.translate("MainWindow", u"Plot Data", None))
+        #self.plotButton.setText(QCoreApplication.translate("MainWindow", u"Plot Data", None))
         self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Datei", None))
         self.menuAnsicht.setTitle(QCoreApplication.translate("MainWindow", u"Ansicht", None))
         self.actionSetAnzFledermause.setText(QCoreApplication.translate("MainWindow", u"Set Anz der Fledermause", None))

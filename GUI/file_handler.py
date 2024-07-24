@@ -32,16 +32,19 @@ def file_writter(serial_port1, serial_port2, ser1, ser2, output_file):
 
                 if data1 is not None and data2 is not None:
                     timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-                    myDataLine = f"{timestamp},{data1},{data2}"
-                    print(f"Writing to file: {myDataLine}")
-                    with open(output_file, 'a') as file:
-                        file.write(myDataLine + '\n')
-                        file.flush()  # Ensure the data is written to the file immediately
-                        file.close()
-                    # Reset the data after writing
-                    data1 = None
-                    data2 = None
-                    time.sleep(1)  # Add a small delay to prevent high CPU usage
+                    if(len(data1.split(","))) >= 3 :
+                        myDataLine = f"{timestamp},{data1},{data2}"
+                        print(f"Writing to file: {myDataLine}")
+                        with open(output_file, 'a') as file:
+                            file.write(myDataLine + '\n')
+                            file.flush()  # Ensure the data is written to the file immediately
+                            file.close()
+                        # Reset the data after writing
+                        data1 = None
+                        data2 = None
+                        time.sleep(1)  # Add a small delay to prevent high CPU usage
+                    else:
+                        pass    
 
                 else:
                     print("No data waiting in the serial buffer.")
