@@ -123,10 +123,9 @@ class MainWindow(QMainWindow):
         
         self.start_file_writer()
 
-        # Create and start the QThread for monitoring serial ports
-        self.monitor_thread = SerialMonitorThread(self.serial_port1, self.serial_port2, self.ser1, self.ser2)
-        self.monitor_thread.warning_signal.connect(self.show_warning)
-        self.monitor_thread.start()
+        self.serial_monitor_thread = threading.Thread(target=self.monitor_serial_ports, daemon=True)
+        self.serial_monitor_thread.start()
+
 
     def show_spinbox_dialog(self):
         if self.spinbox_dialog.exec() == QDialog.Accepted:
@@ -348,6 +347,17 @@ class MainWindow(QMainWindow):
             print("Dialog akzeptiert")
         else:
             print("Dialog abgelehnt")
+
+
+    def monitor_serial_ports(self):
+        while True:
+            time.sleep(5)  # Überprüfe alle 5 Sekunden
+            if not self.ser1 :
+                self.show_warning("Serial Port Error", f"Serial port {self.serial_port1} is not available.")
+                self.ser1 = None
+            if not self.ser2 :
+                self.show_warning("Serial Port Error", f"Serial port {self.serial_port2} is not available.")
+                self.ser2 = None        
 
     def show_warning(self, title, message):
         QMessageBox.warning(self, title, message)
