@@ -123,10 +123,10 @@ class MainWindow(QMainWindow):
         
         self.start_file_writer()
 
-        # # Create and start the QThread for monitoring serial ports
-        # self.monitor_thread = SerialMonitorThread(self.serial_port1, self.serial_port2, self.ser1, self.ser2)
-        # self.monitor_thread.warning_signal.connect(self.show_warning)
-        # self.monitor_thread.start()
+        # Create and start the QThread for monitoring serial ports
+        self.monitor_thread = SerialMonitorThread(self.serial_port1, self.serial_port2, self.ser1, self.ser2)
+        self.monitor_thread.warning_signal.connect(self.show_warning)
+        self.monitor_thread.start()
 
     def show_spinbox_dialog(self):
         if self.spinbox_dialog.exec() == QDialog.Accepted:
