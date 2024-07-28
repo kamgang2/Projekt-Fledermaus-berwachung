@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit
-from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont
+from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox
+from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
 from mainwindow import Ui_MainWindow  
-from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher
+from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher, SerialMonitorThread
 from file_handler import file_writter, data_lesen, data_lesen_zeitraum
+from splashscreen import VideoSplashScreen
 import sys
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, Slot
@@ -33,6 +34,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.lock = threading.Lock() 
         self.setWindowTitle("FLEDERMAUSTRACKER")
+
+        self.setWindowIcon(QIcon("icons/gui_icon.png"))
 
        # Configure the serial port and the baud rate
         self.serial_port1 = 'COM4'  # Replace with your serial port
@@ -120,6 +123,10 @@ class MainWindow(QMainWindow):
         
         self.start_file_writer()
 
+        # # Create and start the QThread for monitoring serial ports
+        # self.monitor_thread = SerialMonitorThread(self.serial_port1, self.serial_port2, self.ser1, self.ser2)
+        # self.monitor_thread.warning_signal.connect(self.show_warning)
+        # self.monitor_thread.start()
 
     def show_spinbox_dialog(self):
         if self.spinbox_dialog.exec() == QDialog.Accepted:
@@ -342,6 +349,8 @@ class MainWindow(QMainWindow):
         else:
             print("Dialog abgelehnt")
 
+    def show_warning(self, title, message):
+        QMessageBox.warning(self, title, message)
 
     def closeEvent(self, event):
         self.file_watcher.stop()
@@ -361,8 +370,11 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow()
-    #window.setWindowTitle("FledermausTracker",  **{'font-size': '14pt', 'font-family': 'digital-7'})
-   # window.start_fileWritter()
-    window.show()
+     # Create and show the video splash screen
+    splash = VideoSplashScreen("0728.mp4")
+    if splash.exec() == QDialog.Accepted:
+        # Show the main window after the splash screen
+        main_window = MainWindow()
+        main_window.show()
+
     sys.exit(app.exec())

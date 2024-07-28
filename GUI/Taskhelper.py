@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime
 from PySide6.QtWidgets import QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
-from PySide6.QtCore import Signal, QObject
+from PySide6.QtCore import Signal, QObject, QThread
 import time
 import os
 import threading
@@ -266,3 +266,21 @@ class FileWatcher(QObject):
     def stop(self):
         self.observer.stop()
                 
+
+class SerialMonitorThread(QThread):
+    warning_signal = Signal(str, str)
+    
+    def __init__(self, serial_port1, serial_port2, ser1, ser2):
+        super().__init__()
+        self.serial_port1 = serial_port1
+        self.serial_port2 = serial_port2
+        self.ser1 = ser1
+        self.ser2 = ser2
+
+    def run(self):
+            if not self.ser1 :
+                self.warning_signal.emit("Serial Port Error", f"Serial port {self.serial_port1} is not available.")
+                self.ser1 = None
+            if not self.ser2:
+                self.warning_signal.emit("Serial Port Error", f"Serial port {self.serial_port2} is not available.")
+                self.ser2 = None

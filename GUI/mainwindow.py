@@ -27,14 +27,6 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(839, 600)
     
-
-        
-        # # Schriftart laden
-        # font_id = QFontDatabase.addApplicationFont("Arial/Arial.ttf")
-        # if font_id == -1:
-        #     print("Schriftart konnte nicht geladen werden!")
-        # font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        # #self.Arialont = QFont(font_family, 24)  # Schriftgröße 24
   
       # Lade das Stylesheet aus einer Datei
         file = QFile("style.qss")

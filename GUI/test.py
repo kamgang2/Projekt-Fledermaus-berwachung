@@ -519,32 +519,104 @@ with open(output_file, 'a') as file:
 
 """
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QFrame, QVBoxLayout, QLCDNumber
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QVBoxLayout,
+    QPushButton,
+    QLabel,
+    QMainWindow
+)
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtGui import QPixmap, QPalette, QColor
+from PySide6.QtCore import QUrl, Slot
+import sys
+
+
+class VideoSplashScreen(QDialog):
+    def __init__(self, video_file, image_file, parent=None):
+        super(VideoSplashScreen, self).__init__(parent)
+        self.setWindowTitle("Splash Screen")
+
+        # Create a layout
+        self.layout = QVBoxLayout(self)
+
+        # Create a video widget
+        self.video_widget = QVideoWidget(self)
+        self.layout.addWidget(self.video_widget)
+
+        # Create a media player
+        self.media_player = QMediaPlayer(self)
+        self.audio_output = QAudioOutput(self)
+        self.media_player.setVideoOutput(self.video_widget)
+        self.media_player.setAudioOutput(self.audio_output)
+
+        # Load the video file
+        self.media_player.setSource(QUrl.fromLocalFile(video_file))
+
+        # Connect signals
+        self.media_player.mediaStatusChanged.connect(self.media_status_changed)
+        self.media_player.errorOccurred.connect(self.handle_error)
+
+        # Play the video
+        self.media_player.play()
+
+        # Initialize the image and start button for later use
+        self.image_file = image_file
+        self.image_label = None
+        self.start_button = None
+
+    @Slot(QMediaPlayer.MediaStatus)
+    def media_status_changed(self, status):
+        if status == QMediaPlayer.EndOfMedia:
+            # Hide the video widget
+            self.video_widget.hide()
+
+            # Set background image
+            self.set_background_image(self.image_file)
+
+            # Show the start button
+            self.show_start_button()
+
+    @Slot()
+    def handle_error(self):
+        print("Error occurred:", self.media_player.errorString())
+
+    def set_background_image(self, image_file):
+        # Create a label to hold the image
+        self.image_label = QLabel(self)
+        pixmap = QPixmap(image_file)
+        self.image_label.setPixmap(pixmap)
+        self.image_label.setScaledContents(True)
+        self.layout.addWidget(self.image_label)
+        self.image_label.show()
+
+    def show_start_button(self):
+        # Add a start button
+        self.start_button = QPushButton("Start", self)
+        self.start_button.clicked.connect(self.accept)  # Close dialog on button click
+        self.layout.addWidget(self.start_button)
+        self.start_button.show()
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(MainWindow, self).__init__()
+        self.setWindowTitle("Main Application")
+        self.setGeometry(100, 100, 800, 600)
+        # Add more UI setup here if needed
 
-        # Create a frame to hold the QLCDNumber
-        self.frame = QFrame(self)
-        self.frame.setStyleSheet("""
-            border-radius: 49px;
-            background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #cacaca, stop:1 #f0f0f0);
-            box-shadow: 5px 5px 14px #c3c3c3, -5px -5px 14px #fdfdfd;
-        """)
-
-        # Create the QLCDNumber and set it as a child of the frame
-        self.lcdTemp = QLCDNumber(self.frame)
-        self.lcdTemp.display(1234)
-
-        # Create a layout to manage the frame's layout
-        layout = QVBoxLayout(self.frame)
-        layout.addWidget(self.lcdTemp)
-
-        self.setCentralWidget(self.frame)
 
 if __name__ == "__main__":
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    app.exec()
+    app = QApplication(sys.argv)
+
+    # Create and show the combined splash screen
+    splash = VideoSplashScreen("0728.mp4", "icons/gui_icon.png")
+    if splash.exec() == QDialog.Accepted:
+        # Show the main window after the splash screen
+        main_window = MainWindow()
+        main_window.show()
+
+    sys.exit(app.exec())
+
