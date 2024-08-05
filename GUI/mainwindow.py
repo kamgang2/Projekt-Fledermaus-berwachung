@@ -9,7 +9,7 @@
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
+    QMetaObject, QObject, QPoint, QRect, QPropertyAnimation, 
     QSize, QTime, QUrl, Qt, QFile, QTextStream)
 from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QCursor, QFont, QFontDatabase, QGradient, 
@@ -185,7 +185,6 @@ class Ui_MainWindow(object):
 
         MainWindow.setMenuBar(self.menubar)
         
-
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -193,6 +192,51 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuDatei.menuAction())
         self.menubar.addAction(self.menuAnsicht.menuAction())
         self.menubar.addAction(self.menuEinstellung.menuAction())
+
+        self.toggle_sidebar_action = QAction("Toggle")
+        self.menubar.addAction(self.toggle_sidebar_action)
+
+
+        # #Side animated Window to Temperatur one by one
+        #  #open the sidebar
+        #   # Seitenbereich
+        # self.sidebar = QWidget()
+        # self.sidebar.setStyleSheet("background-color: lightgray;")
+        # #self.sidebar.setFixedWidth(200)
+        # self.sidebar.move(800, -100)
+
+        # # Seitenbereichs-Layout
+        # sidebar_layout = QGridLayout(self.sidebar)
+
+        # # Erste LCD-Anzeige
+        # self.lcd_first_temp = QLCDNumber()
+        # self.lcd_first_temp_label = QLabel("Temp1")
+        # sidebar_layout.addWidget(self.lcd_first_temp,0,0, 1, 3)
+        # sidebar_layout.addWidget(self.lcd_first_temp_label, 1, 0, 1,1 )
+
+        # # Zweite LCD-Anzeige
+        # self.lcd_sec_temp = QLCDNumber()
+        # self.lcd_sec_temp_label = QLabel("Temp2")
+        # sidebar_layout.addWidget(self.lcd_sec_temp, 2, 0, 1, 3)
+        # sidebar_layout.addWidget(self.lcd_sec_temp_label, 3,0,1,1)
+
+        # # Dritte LCD-Anzeige
+        # self.lcd_third_temp = QLCDNumber()
+        # self.lcd_third_temp_label = QLabel("Temp2")
+        # sidebar_layout.addWidget(self.lcd_third_temp, 4, 0, 1, 3)
+        # sidebar_layout.addWidget(self.lcd_third_temp_label, 5,0,1,1)
+
+
+        # # Animation
+        # self.animation = QPropertyAnimation(self.sidebar, b"geometry")
+        # self.animation.setDuration(500)
+
+        # # Initialer Zustand der Seitenleiste
+        # self.sidebar_open = False
+        # self.sidebar.hide()
+
+        # self.gridLayout.addWidget(self.sidebar, 30, 1, 1, 2)
+
 
         self.retranslateUi(MainWindow)
 

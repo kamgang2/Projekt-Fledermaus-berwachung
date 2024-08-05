@@ -131,7 +131,15 @@ void loop() {
   Serial.print(h_ges);
   Serial.print(F("%,"));
   Serial.print(t_ges);
-  Serial.println(F("C "));
+  Serial.print(F("C,"));
+  Serial.print(t1); 
+  Serial.print("T1,"); 
+  Serial.print(t2); 
+  Serial.print("T2,"); 
+  Serial.print(t3); 
+  Serial.println("T3"); 
+
+
 
   // TFT Ausgabe
   TFTScreen.fillScreen(ST77XX_BLACK);

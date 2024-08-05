@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox, QWidget, QFrame, QGridLayout
 from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
 from mainwindow import Ui_MainWindow  
 from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher, SerialMonitorThread
@@ -6,7 +6,7 @@ from file_handler import file_writter, data_lesen, data_lesen_zeitraum
 from splashscreen import VideoSplashScreen
 import sys
 import pyqtgraph as pg
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, Slot, QRect, QPropertyAnimation
 import serial
 import os
 import time
@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("FLEDERMAUSTRACKER")
 
         self.setWindowIcon(QIcon("icons/gui_icon.png"))
+
 
        # Configure the serial port and the baud rate
         self.serial_port1 = 'COM4'  # Replace with your serial port
@@ -116,6 +117,51 @@ class MainWindow(QMainWindow):
 
         # Connect plot button with plot_data method
         self.plot_data()
+        
+
+        #open the sidebar
+          # Seitenbereich
+        self.sidebar = QFrame(self)
+        self.sidebar.setStyleSheet("background-color: #E9F1FA;")
+        self.sidebar.setFixedWidth(200)
+        self.sidebar.move(800, -100)
+
+        # Seitenbereichs-Layout
+        sidebar_layout = QGridLayout(self.sidebar)
+
+        # Erste LCD-Anzeige
+        self.lcd_first_temp = QLCDNumber()
+        self.lcd_first_temp.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
+        self.lcd_first_temp_label = QLabel("Temp1")
+        self.lcd_first_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
+        sidebar_layout.addWidget(self.lcd_first_temp,0,0, 1, 3)
+        sidebar_layout.addWidget(self.lcd_first_temp_label, 1, 0, 1,1 )
+
+        # Zweite LCD-Anzeige
+        self.lcd_sec_temp = QLCDNumber()
+        self.lcd_sec_temp.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
+        self.lcd_sec_temp_label = QLabel("Temp2")
+        self.lcd_sec_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
+        sidebar_layout.addWidget(self.lcd_sec_temp, 2, 0, 1, 3)
+        sidebar_layout.addWidget(self.lcd_sec_temp_label, 3,0,1,1)
+
+        # Dritte LCD-Anzeige
+        self.lcd_third_temp = QLCDNumber()
+        self.lcd_third_temp.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
+        self.lcd_third_temp_label = QLabel("Temp2")
+        self.lcd_third_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
+        sidebar_layout.addWidget(self.lcd_third_temp, 4, 0, 1, 3)
+        sidebar_layout.addWidget(self.lcd_third_temp_label, 5,0,1,1)
+
+
+        # Animation
+        self.animation = QPropertyAnimation(self.sidebar, b"geometry")
+        self.animation.setDuration(500)
+
+        # Initialer Zustand der Seitenleiste
+        self.sidebar_open = False
+        self.ui.toggle_sidebar_action.triggered.connect(self.toggle_sidebar)
+        
 
         self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__),  self.output_file))
         self.file_watcher.start()
@@ -123,8 +169,8 @@ class MainWindow(QMainWindow):
         
         self.start_file_writer()
 
-        self.serial_monitor_thread = threading.Thread(target=self.monitor_serial_ports, daemon=True)
-        self.serial_monitor_thread.start()
+        # self.serial_monitor_thread = threading.Thread(target=self.monitor_serial_ports, daemon=True)
+        # self.serial_monitor_thread.start()
 
 
     def show_spinbox_dialog(self):
@@ -376,6 +422,22 @@ class MainWindow(QMainWindow):
                 daemon=True
             )
             thread_file_writer.start()
+
+    def toggle_sidebar(self):
+        if self.sidebar_open:
+            # Sidebar ausblenden
+            self.animation.setStartValue(QRect(self.x(), self.y(), self.width(), self.height()))
+            self.animation.setEndValue(QRect(self.x() - self.width(), self.y(), self.width(), self.height()))
+            self.sidebar_open = False
+        else:
+            # Sidebar einblenden
+            self.animation.setStartValue(QRect(self.x() - self.width(), self.y(), self.width(), self.height()))
+            self.animation.setEndValue(QRect(self.x(), self.y(), self.width(), self.height()))
+            self.sidebar_open = True
+
+        self.animation.start()
+
+   
       
 
 if __name__ == "__main__":

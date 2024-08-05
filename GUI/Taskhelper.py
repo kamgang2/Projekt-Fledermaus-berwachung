@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime
-from PySide6.QtWidgets import QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
-from PySide6.QtCore import Signal, QObject, QThread
+from PySide6.QtWidgets import QSpinBox, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QWidget, QLCDNumber
+from PySide6.QtCore import Signal, QObject, QThread, QPropertyAnimation, QRect
 import time
 import os
 import threading
@@ -284,3 +284,4 @@ class SerialMonitorThread(QThread):
             if not self.ser2:
                 self.warning_signal.emit("Serial Port Error", f"Serial port {self.serial_port2} is not available.")
                 self.ser2 = None
+

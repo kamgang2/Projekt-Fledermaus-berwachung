@@ -518,7 +518,7 @@ with open(output_file, 'a') as file:
         print(f"Disconnected from {serial_port1} and {serial_port2}.")   
 
 """
-
+"""
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
@@ -620,3 +620,68 @@ if __name__ == "__main__":
 
     sys.exit(app.exec())
 
+"""
+
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLCDNumber
+from PySide6.QtCore import QPropertyAnimation, QRect, Qt
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Hauptfenster-Einstellungen
+        self.setWindowTitle("Seitenbereich von rechts nach links")
+        self.setGeometry(100, 100, 800, 600)
+
+        # Hauptwidget und Layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+
+        # Button zum Öffnen/Schließen des Seitenbereichs
+        self.toggle_button = QPushButton("Toggle Sidebar")
+        layout.addWidget(self.toggle_button)
+        self.toggle_button.clicked.connect(self.toggle_sidebar)
+
+        # Seitenbereich
+        self.sidebar = QWidget(self)
+        self.sidebar.setFixedWidth(200)
+        self.sidebar.setStyleSheet("background-color: lightgray;")
+        self.sidebar.move(800, 0)
+
+        # Seitenbereichs-Layout
+        sidebar_layout = QVBoxLayout(self.sidebar)
+
+        # LCD-Anzeige
+        self.lcd_display = QLCDNumber()
+        self.lcd_display1 = QLCDNumber()
+        sidebar_layout.addWidget(self.lcd_display)
+        sidebar_layout.addWidget(self.lcd_display1)
+
+        # Animation
+        self.animation = QPropertyAnimation(self.sidebar, b"geometry")
+        self.animation.setDuration(500)
+
+        # Initialer Zustand der Seitenleiste
+        self.sidebar_open = False
+
+    def toggle_sidebar(self):
+        if self.sidebar_open:
+            # Seitenbereich schließen
+            self.animation.setStartValue(QRect(600, 0, 200, 600))
+            self.animation.setEndValue(QRect(800, 0, 200, 600))
+            self.sidebar_open = False
+        else:
+            # Seitenbereich öffnen
+            self.animation.setStartValue(QRect(800, 0, 200, 600))
+            self.animation.setEndValue(QRect(600, 0, 200, 600))
+            self.sidebar_open = True
+
+        self.animation.start()
+
+if __name__ == "__main__":
+    app = QApplication([])
+
+    window = MainWindow()
+    window.show()
+
+    app.exec()
