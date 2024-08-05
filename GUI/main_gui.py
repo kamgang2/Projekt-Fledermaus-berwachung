@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox, QWidget, QFrame, QGridLayout
 from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
 from mainwindow import Ui_MainWindow  
-from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime, SpinBoxDialog,FileWatcher, SerialMonitorThread
+from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread
 from file_handler import file_writter, data_lesen, data_lesen_zeitraum
 from splashscreen import VideoSplashScreen
 import sys
@@ -80,6 +80,9 @@ class MainWindow(QMainWindow):
         self.gesamtzahl = 0
         self.LuftFeuchtigkeit = 0
         self.Temp = 0
+        self.Temp1 = 0
+        self.Temp2 = 0
+        self.Temp3 = 0
 
         self.spinbox = QSpinBox()
         self.spinbox.setVisible(False)
@@ -114,17 +117,13 @@ class MainWindow(QMainWindow):
 
         # Save the Data in Excel file 
         self.ui.actionExportExcel.triggered.connect(self.data_in_excel_speichern)
-
-        # Connect plot button with plot_data method
-        self.plot_data()
         
-
         #open the sidebar
           # Seitenbereich
         self.sidebar = QFrame(self)
         self.sidebar.setStyleSheet("background-color: #E9F1FA;")
         self.sidebar.setFixedWidth(200)
-        self.sidebar.move(800, -100)
+        self.sidebar.move(800, 0)
 
         # Seitenbereichs-Layout
         sidebar_layout = QGridLayout(self.sidebar)
@@ -161,6 +160,10 @@ class MainWindow(QMainWindow):
         # Initialer Zustand der Seitenleiste
         self.sidebar_open = False
         self.ui.toggle_sidebar_action.triggered.connect(self.toggle_sidebar)
+
+        # Connect plot button with plot_data method
+        self.plot_data()
+        self.ui.plotButton.clicked.connect(self.plot_data)
         
 
         self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__),  self.output_file))
@@ -221,6 +224,11 @@ class MainWindow(QMainWindow):
         if not self.data:
             return
         self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser,self.yTemp, self.yLuft, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
+        
+        self.Temp1, self.Temp2, self.Temp3 = read_single_Tempvalue(self.data)
+        self.lcd_first_temp.display(self.Temp1)
+        self.lcd_sec_temp.display(self.Temp2)
+        self.lcd_third_temp.display(self.Temp3)
 
         # Convert times to datetime
         self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
@@ -310,6 +318,8 @@ class MainWindow(QMainWindow):
         gesamtzahl = 0
         Temp = 0
         LuftFeuchtigkeit = 0
+        Temp1 = 0  # To receive the value of the first DHT
+        Temp2 = 0 #
 
         daten = timescaling(data, sc_factor)
         if not daten:

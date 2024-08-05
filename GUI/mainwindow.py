@@ -151,9 +151,9 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.label, 15, 1)
 
         # Plot Button
-        # self.plotButton = QPushButton(self.centralwidget)
-        # self.plotButton.setObjectName(u"plotButton")
-        # self.gridLayout.addWidget(self.plotButton, 16, 1, 1, 2)
+        self.plotButton = QPushButton(self.centralwidget)
+        self.plotButton.setObjectName(u"plotButton")
+        self.gridLayout.addWidget(self.plotButton, 16, 1, 1, 2)
 
         MainWindow.setCentralWidget(self.centralwidget)
          
@@ -193,7 +193,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuAnsicht.menuAction())
         self.menubar.addAction(self.menuEinstellung.menuAction())
 
-        self.toggle_sidebar_action = QAction("Toggle")
+        self.toggle_sidebar_action = QAction("Einzelne Temperature")
         self.menubar.addAction(self.toggle_sidebar_action)
 
 
@@ -247,7 +247,7 @@ class Ui_MainWindow(object):
         self.TempLabel.setText(QCoreApplication.translate("MainWindow", u"Temperature in \u00b0C", None))
         self.LuftLabel.setText(QCoreApplication.translate("MainWindow", u"Luftfeuchtigkeit in %", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Anzahl der Fledermäuse", None))
-        #self.plotButton.setText(QCoreApplication.translate("MainWindow", u"Plot Data", None))
+        self.plotButton.setText(QCoreApplication.translate("MainWindow", u"Aktualisieren", None))
         self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Datei", None))
         self.menuAnsicht.setTitle(QCoreApplication.translate("MainWindow", u"Ansicht", None))
         self.actionSetAnzFledermause.setText(QCoreApplication.translate("MainWindow", u"Set Anz der Fledermause", None))

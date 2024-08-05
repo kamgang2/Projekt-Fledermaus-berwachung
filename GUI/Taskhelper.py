@@ -140,6 +140,14 @@ def process_average_data(daten):
     
     return zeiten, yeinDaten, yausDaten, yanzMäuser, yTemp, yLuft
 
+def read_single_Tempvalue(daten): 
+    the_last_line = daten[-1]
+    the_last_line_splited = the_last_line.split(",")
+    Temp1= the_last_line_splited[6].strip().replace("T1", "")
+    Temp2= the_last_line_splited[7].strip().replace("T2", "")
+    Temp3= the_last_line_splited[8].strip().replace("T3", "")
+     
+    return Temp1, Temp2, Temp3
 
 def convert_to_datetime(value):
         try:
