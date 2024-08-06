@@ -685,3 +685,27 @@ if __name__ == "__main__":
     window.show()
 
     app.exec()
+
+
+
+"""
+def data_lesen(lese_datei):
+    try:
+        with open(lese_datei, "r") as myfile:
+            # Initialize an empty list to store lines
+            lines = []
+            
+            # Iterate over each line in the file
+            for line in myfile:
+                # Strip whitespace and check if line ends with a semicolon
+                line = line.strip()
+                if line.endswith(";"):
+                    # Add the line to the list if it ends with a semicolon
+                    lines.append(line)
+            
+            # Return the list of lines
+            return lines
+    except FileNotFoundError:
+        print(f"Datei {lese_datei} nicht gefunden.")
+        return []
+"""
