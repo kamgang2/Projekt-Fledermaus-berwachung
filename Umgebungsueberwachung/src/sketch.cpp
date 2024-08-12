@@ -137,7 +137,13 @@ void loop() {
   Serial.print(t2); 
   Serial.print("T2,"); 
   Serial.print(t3); 
-  Serial.println("T3"); 
+  Serial.print("T3,"); 
+  Serial.print(h1); 
+  Serial.print("H1,");
+  Serial.print(h2); 
+  Serial.print("H2,");
+  Serial.print(h3); 
+  Serial.println("H3");   
 
 
 

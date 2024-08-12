@@ -83,20 +83,9 @@ class MainWindow(QMainWindow):
         self.Temp1 = 0
         self.Temp2 = 0
         self.Temp3 = 0
-
-        # Erstelle die Linien für das Crosshair
-        self.vLine = pg.InfiniteLine(angle=90, movable=False)
-        self.hLine = pg.InfiniteLine(angle=0, movable=False)
-
-        self.ui.plotWidget1.addItem(self.vLine, ignoreBounds=True)
-        self.ui.plotWidget1.addItem(self.hLine, ignoreBounds=True)
-        
-        self.ui.plotWidget2.addItem(self.vLine, ignoreBounds=True)
-        self.ui.plotWidget2.addItem(self.hLine, ignoreBounds=True)
-
-        # Connect the mouse movement signal to the update function
-        self.ui.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
-        self.ui.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
+        self.Hum1 = 0 
+        self.Hum2 = 0
+        self.Hum3 = 0
 
         self.spinbox = QSpinBox()
         self.spinbox.setVisible(False)
@@ -204,12 +193,13 @@ class MainWindow(QMainWindow):
         self.plot_data()
         self.ui.plotButton.clicked.connect(self.plot_data)
         
-
+         
+        self.start_file_writer()
+        
         self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__),  self.output_file))
         self.file_watcher.start()
         self.file_watcher.file_modified.connect(self.on_file_modified)
-        
-        self.start_file_writer()
+       
 
         # self.serial_monitor_thread = threading.Thread(target=self.monitor_serial_ports, daemon=True)
         # self.serial_monitor_thread.start()
@@ -259,17 +249,35 @@ class MainWindow(QMainWindow):
         p1 = self.ui.plotWidget2
         p2 =  self.ui.viewBox 
 
+        # Erstelle die Linien für das Crosshair
+        self.vLine1 = pg.InfiniteLine(angle=90, movable=False)
+        self.hLine1 = pg.InfiniteLine(angle=0, movable=False)
+        self.vLine2 = pg.InfiniteLine(angle=90, movable=False)
+        self.hLine2 = pg.InfiniteLine(angle=0, movable=False)
+
+        self.ui.plotWidget1.addItem(self.vLine1, ignoreBounds=True)
+        self.ui.plotWidget1.addItem(self.hLine1, ignoreBounds=True)
+
+        self.ui.plotWidget2.addItem(self.vLine2, ignoreBounds=True)
+        self.ui.plotWidget2.addItem(self.hLine2, ignoreBounds=True)
 
 
+        # Connect the mouse movement signal to the update function
+        self.ui.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
+        self.ui.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
+    
         self.data = data_lesen(self.output_file)
         if not self.data:
             return
         self.zeiten, self.yeinDaten, self.yausDaten, self.yanzMäuser,self.yTemp, self.yLuft, gesamtzahl, LuftFeuchtigkeit, Temp = self.process_data(self.data, self.get_action_checked())
         
-        self.Temp1, self.Temp2, self.Temp3 = read_single_Tempvalue(self.data)
+        self.Temp1, self.Temp2, self.Temp3, self.Hum1, self.Hum2, self.Hum3 = read_single_Tempvalue(self.data)
         self.lcd_first_temp.display(self.Temp1)
         self.lcd_sec_temp.display(self.Temp2)
         self.lcd_third_temp.display(self.Temp3)
+        self.lcd_first_hum.display(self.Hum1)
+        self.lcd_sec_hum.display(self.Hum2)
+        self.lcd_third_hum.display(self.Hum3)
 
         # Convert times to datetime
         self.zeiten = [convert_to_datetime(x) for x in self.zeiten]
@@ -346,6 +354,9 @@ class MainWindow(QMainWindow):
         self.ui.lcdTemp.repaint()
         self.ui.LuftProgessBar.repaint()
         self.ui.lcdLuft.repaint()
+         # Explizit neuzzeichnen
+        self.ui.plotWidget1.repaint()
+        self.ui.plotWidget2.repaint()
 
         print("Data plotted successfully")
 
@@ -357,8 +368,8 @@ class MainWindow(QMainWindow):
             index = int(mousePoint.x())
             y_value= int(mousePoint.y())
              # Aktualisiere die Position der Linien
-            self.vLine.setPos(mousePoint.x())
-            self.hLine.setPos(mousePoint.y())
+            self.vLine1.setPos(mousePoint.x())
+            self.hLine1.setPos(mousePoint.y())
             if index >= 0 and index < len(self.zeiten):
                 self.ui.statusbar.showMessage(f'Fledermäuse  Zeit: {self.zeiten[index]}, Wert: {y_value:.2f}')
         elif self.ui.plotWidget2.sceneBoundingRect().contains(pos):
@@ -366,8 +377,8 @@ class MainWindow(QMainWindow):
             index = int(mousePoint.x())
             y_value= int(mousePoint.y())
              # Aktualisiere die Position der Linien
-            self.vLine.setPos(mousePoint.x())
-            self.hLine.setPos(mousePoint.y())
+            self.vLine2.setPos(mousePoint.x())
+            self.hLine2.setPos(mousePoint.y())
             if index >= 0 and index < len(self.zeiten):
                 self.ui.statusbar.showMessage(f'Umwelt  Zeit: {self.zeiten[index]}, Temperatur: {self.yTemp[y_value]:.2f}')
            
@@ -382,8 +393,6 @@ class MainWindow(QMainWindow):
         gesamtzahl = 0
         Temp = 0
         LuftFeuchtigkeit = 0
-        Temp1 = 0  # To receive the value of the first DHT
-        Temp2 = 0 #
 
         daten = timescaling(data, sc_factor)
         if not daten:

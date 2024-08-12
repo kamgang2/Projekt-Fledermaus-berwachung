@@ -146,8 +146,11 @@ def read_single_Tempvalue(daten):
     Temp1= the_last_line_splited[6].strip().replace("T1", "")
     Temp2= the_last_line_splited[7].strip().replace("T2", "")
     Temp3= the_last_line_splited[8].strip().replace("T3", "")
+    Hum1= the_last_line_splited[9].strip().replace("H1", "")
+    Hum2= the_last_line_splited[10].strip().replace("H2", "")
+    Hum3= the_last_line_splited[11].strip().replace("H3", "")
      
-    return Temp1, Temp2, Temp3
+    return Temp1, Temp2, Temp3, Hum1, Hum2, Hum3
 
 def convert_to_datetime(value):
         try:
