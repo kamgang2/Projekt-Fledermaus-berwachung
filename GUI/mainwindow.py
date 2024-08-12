@@ -193,6 +193,11 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuAnsicht.menuAction())
         self.menubar.addAction(self.menuEinstellung.menuAction())
 
+        # Füge ein leeres QMenu hinzu, um Abstand zu erzeugen
+        spacer_menu = QMenu("         ", self.menubar)  # Leeres Menü ohne Titel
+        spacer_menu.setObjectName("spacer")
+        self.menubar.addMenu(spacer_menu)
+
         self.toggle_sidebar_action = QAction("Einzelne Temperature")
         self.menubar.addAction(self.toggle_sidebar_action)
 

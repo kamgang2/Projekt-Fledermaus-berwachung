@@ -54,6 +54,7 @@ QMenuBar {
     background: #00ABE4;  /* Hintergrundfarbe der Menüleiste */
     color: #FFFFFF;  /* Textfarbe */
     border: none;  /* Entfernt den Rahmen, falls gewünscht */
+    margin-right: 30px;
 }
 
 /* Schriftart und Stil für die Menüs */
@@ -64,6 +65,7 @@ QMenu {
     color: #FFFFFF;  /* Textfarbe */
     border: 2px solid #00ABE4;  /* Rahmen um das Menü */
     border-radius: 10px;  /* Abgerundete Ecken */
+    
 }
 
 /* Schriftart und Stil für die Menüeinträge */
@@ -80,6 +82,15 @@ QMenu::item:selected {
     color: #FFFFFF;  /* Textfarbe beim Hover */
 }
 
+#spacer:hover {
+    /* Setze alle relevanten Stile zurück, um Hover-Effekte zu verhindern */
+    all: unset;
+    background: none;
+    color: inherit;  /* Vererbt die ursprüngliche Textfarbe, falls vorhanden */
+    border: none;
+    box-shadow: none;  /* Entfernt jeglichen Schatteneffekt */
+    cursor: default;  /* Verhindert, dass der Cursor sich verändert */
+}
 
 QDialog {
     border-radius: 10px;

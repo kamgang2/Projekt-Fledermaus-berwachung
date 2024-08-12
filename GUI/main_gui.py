@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
 
        # Configure the serial port and the baud rate
         self.serial_port1 = 'COM4'  # Replace with your serial port
-        self.serial_port2 = 'COM5'
+        self.serial_port2 = 'COM9'
         self.baud_rate = 9600
         self.output_file = 'serial_data.txt'
         
@@ -84,6 +84,20 @@ class MainWindow(QMainWindow):
         self.Temp2 = 0
         self.Temp3 = 0
 
+        # Erstelle die Linien für das Crosshair
+        self.vLine = pg.InfiniteLine(angle=90, movable=False)
+        self.hLine = pg.InfiniteLine(angle=0, movable=False)
+
+        self.ui.plotWidget1.addItem(self.vLine, ignoreBounds=True)
+        self.ui.plotWidget1.addItem(self.hLine, ignoreBounds=True)
+        
+        self.ui.plotWidget2.addItem(self.vLine, ignoreBounds=True)
+        self.ui.plotWidget2.addItem(self.hLine, ignoreBounds=True)
+
+        # Connect the mouse movement signal to the update function
+        self.ui.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
+        self.ui.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
+
         self.spinbox = QSpinBox()
         self.spinbox.setVisible(False)
 
@@ -122,7 +136,7 @@ class MainWindow(QMainWindow):
           # Seitenbereich
         self.sidebar = QFrame(self)
         self.sidebar.setStyleSheet("background-color: #E9F1FA;")
-        self.sidebar.setFixedWidth(200)
+        self.sidebar.setFixedWidth(400)
         self.sidebar.move(800, 0)
 
         # Seitenbereichs-Layout
@@ -151,6 +165,31 @@ class MainWindow(QMainWindow):
         self.lcd_third_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
         sidebar_layout.addWidget(self.lcd_third_temp, 4, 0, 1, 3)
         sidebar_layout.addWidget(self.lcd_third_temp_label, 5,0,1,1)
+
+        # 2 Column Erste LCD
+        self.lcd_first_hum = QLCDNumber()
+        self.lcd_first_hum.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
+        self.lcd_first_hum_label = QLabel("HUM 1")
+        self.lcd_first_hum_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
+        sidebar_layout.addWidget(self.lcd_first_hum,0,3, 1, 3)
+        sidebar_layout.addWidget(self.lcd_first_hum_label, 1, 3, 1,1 )
+
+        # 2 Column Zweite LCD-Anzeige
+        self.lcd_sec_hum = QLCDNumber()
+        self.lcd_sec_hum.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
+        self.lcd_sec_hum_label = QLabel("HUM 2")
+        self.lcd_sec_hum_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
+        sidebar_layout.addWidget(self.lcd_sec_hum, 2, 3, 1, 3)
+        sidebar_layout.addWidget(self.lcd_sec_hum_label, 3,3,1,1)
+
+        # 2 Column Dritte LCD-Anzeige
+        self.lcd_third_hum = QLCDNumber()
+        self.lcd_third_hum.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
+        self.lcd_third_hum_label = QLabel("HUM 3")
+        self.lcd_third_hum_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
+        sidebar_layout.addWidget(self.lcd_third_hum, 4, 3, 1, 3)
+        sidebar_layout.addWidget(self.lcd_third_hum_label, 5,3,1,1)
+
 
 
         # Animation
@@ -219,6 +258,8 @@ class MainWindow(QMainWindow):
         # Plotwidget2 
         p1 = self.ui.plotWidget2
         p2 =  self.ui.viewBox 
+
+
 
         self.data = data_lesen(self.output_file)
         if not self.data:
@@ -307,6 +348,29 @@ class MainWindow(QMainWindow):
         self.ui.lcdLuft.repaint()
 
         print("Data plotted successfully")
+
+    def onMouseMoved(self, evt):
+    # Erhalte die Position der Maus relativ zum Scene
+        pos = evt
+        if self.ui.plotWidget1.sceneBoundingRect().contains(pos):
+            mousePoint = self.ui.plotWidget1.getViewBox().mapSceneToView(pos)
+            index = int(mousePoint.x())
+            y_value= int(mousePoint.y())
+             # Aktualisiere die Position der Linien
+            self.vLine.setPos(mousePoint.x())
+            self.hLine.setPos(mousePoint.y())
+            if index >= 0 and index < len(self.zeiten):
+                self.ui.statusbar.showMessage(f'Fledermäuse  Zeit: {self.zeiten[index]}, Wert: {y_value:.2f}')
+        elif self.ui.plotWidget2.sceneBoundingRect().contains(pos):
+            mousePoint = self.ui.plotWidget2.getViewBox().mapSceneToView(pos)
+            index = int(mousePoint.x())
+            y_value= int(mousePoint.y())
+             # Aktualisiere die Position der Linien
+            self.vLine.setPos(mousePoint.x())
+            self.hLine.setPos(mousePoint.y())
+            if index >= 0 and index < len(self.zeiten):
+                self.ui.statusbar.showMessage(f'Umwelt  Zeit: {self.zeiten[index]}, Temperatur: {self.yTemp[y_value]:.2f}')
+           
 
     def process_data(self, data, sc_factor: scalefactor):
         yeinDaten = []

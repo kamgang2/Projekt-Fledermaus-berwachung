@@ -54,7 +54,9 @@ def file_writter(serial_port1, serial_port2, ser1, ser2, output_file):
     except serial.SerialException as e:
         print(f"Serial communication error: {e}")
     finally:
-        print(f"Disconnected from {serial_port1} and {serial_port2}.")   
+       # print(f"Disconnected from {serial_port1} and {serial_port2}.")   
+       if ser1 :
+           QMessageBox.warning(None , "Warning", "Micron 1", buttons=QMessageBox.Ok, defaultButton=QMessageBox.NoButton)
 
 
 

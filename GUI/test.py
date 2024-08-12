@@ -239,10 +239,10 @@ for key, average in averages.items():
     print(f"Gruppe: {key}, Durchschnittswert: {average}")
 
     """
-"""
+
 import pyqtgraph.examples
 pyqtgraph.examples.run()
-"""
+
 
 """
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QSpinBox, QLabel
@@ -621,6 +621,7 @@ if __name__ == "__main__":
     sys.exit(app.exec())
 
 """
+"""
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLCDNumber
 from PySide6.QtCore import QPropertyAnimation, QRect, Qt
@@ -685,7 +686,7 @@ if __name__ == "__main__":
     window.show()
 
     app.exec()
-
+"""
 
 
 """
