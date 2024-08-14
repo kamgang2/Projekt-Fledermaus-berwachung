@@ -61,6 +61,10 @@ class Ui_MainWindow(object):
          # Schriftart für Titel anpassen
         title_font = QFont('Arial', 14)  # 'Arial' ist die Schriftart, 14pt ist die Schriftgröße
         self.plotWidget1.getPlotItem().setTitle('Ein- und Aus-Fluege über die Zeit', color='black', size='14pt', font=title_font)
+        
+        self.label1 = pg.LabelItem(justify='left')
+        self.plotWidget1.addItem(self.label1)
+        
 
         self.plotWidget1.setObjectName(u"plotWidget1")
         self.tab1Layout.addWidget(self.plotWidget1)
@@ -79,6 +83,13 @@ class Ui_MainWindow(object):
         self.plotWidget2.setObjectName(u"plotWidget2")
         self.tab2Layout.addWidget(self.plotWidget2)
         self.tabWidget.addTab(self.tab2, "Umweltmessungen")
+
+           # Create Labels
+        self.label2 = pg.LabelItem(justify='left')
+        self.plotWidget2.addItem(self.label2)
+        
+      
+       
 
         
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 17, 1)

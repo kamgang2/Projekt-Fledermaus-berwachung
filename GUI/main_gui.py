@@ -68,6 +68,8 @@ class MainWindow(QMainWindow):
         self.ui.plotWidget1.setBackground('w')
         self.ui.plotWidget2.setBackground('w')
 
+        self.ui.tabWidget.currentChanged.connect(self.onTabChanged)
+
         # Set segment style of QLCDNumber widget
         self.ui.lcdGesamtzahl.setSegmentStyle(QLCDNumber.Flat)
 
@@ -189,6 +191,19 @@ class MainWindow(QMainWindow):
         self.sidebar_open = False
         self.ui.toggle_sidebar_action.triggered.connect(self.toggle_sidebar)
 
+        # #Window to show the mouse's Position
+        # self.mouse_position1 = pg.TextItem( anchor=(0, 1), color= 'red', border='red')
+        # self.mouse_position1.setZValue(10)
+        # self.mouse_position1.setPos(10, 10)
+        # self.mouse_position2 = pg.TextItem(anchor= (0, 1), color= 'red', border= 'red')
+        # self.mouse_position2.setZValue(10)
+        # self.mouse_position2.setPos(10, 10)
+        # self.ui.plotWidget1.addItem(self.mouse_position1)
+        # self.ui.plotWidget2.addItem(self.mouse_position2)
+        # Connect the mouse movement signal to the update function
+        self.ui.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
+        self.ui.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
+
         # Connect plot button with plot_data method
         self.plot_data()
         self.ui.plotButton.clicked.connect(self.plot_data)
@@ -249,22 +264,20 @@ class MainWindow(QMainWindow):
         p1 = self.ui.plotWidget2
         p2 =  self.ui.viewBox 
 
-        # Erstelle die Linien für das Crosshair
-        self.vLine1 = pg.InfiniteLine(angle=90, movable=False)
-        self.hLine1 = pg.InfiniteLine(angle=0, movable=False)
-        self.vLine2 = pg.InfiniteLine(angle=90, movable=False)
-        self.hLine2 = pg.InfiniteLine(angle=0, movable=False)
+        # # Erstelle die Linien für das Crosshair
+        # self.vLine1 = pg.InfiniteLine(angle=90, movable=False)
+        # self.hLine1 = pg.InfiniteLine(angle=0, movable=False)
+        # self.vLine2 = pg.InfiniteLine(angle=90, movable=False)
+        # self.hLine2 = pg.InfiniteLine(angle=0, movable=False)
 
-        self.ui.plotWidget1.addItem(self.vLine1, ignoreBounds=True)
-        self.ui.plotWidget1.addItem(self.hLine1, ignoreBounds=True)
+        # self.ui.plotWidget1.addItem(self.vLine1, ignoreBounds=True)
+        # self.ui.plotWidget1.addItem(self.hLine1, ignoreBounds=True)
 
-        self.ui.plotWidget2.addItem(self.vLine2, ignoreBounds=True)
-        self.ui.plotWidget2.addItem(self.hLine2, ignoreBounds=True)
+        # self.ui.plotWidget2.addItem(self.vLine2, ignoreBounds=True)
+        # self.ui.plotWidget2.addItem(self.hLine2, ignoreBounds=True)
 
 
-        # Connect the mouse movement signal to the update function
-        self.ui.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
-        self.ui.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
+        
     
         self.data = data_lesen(self.output_file)
         if not self.data:
@@ -360,27 +373,29 @@ class MainWindow(QMainWindow):
 
         print("Data plotted successfully")
 
+    def onTabChanged(self, index):
+        # Deaktiviere Mausereignisse für das nicht sichtbare Widget
+        if index == 0:  # Tab 1 ist aktiv
+            self.ui.plotWidget2.setMouseTracking(False)
+            self.ui.plotWidget1.setMouseTracking(True)
+        elif index == 1:  # Tab 2 ist aktiv
+            self.ui.plotWidget1.setMouseTracking(False)
+            self.ui.plotWidget2.setMouseTracking(True)
+
     def onMouseMoved(self, evt):
-    # Erhalte die Position der Maus relativ zum Scene
-        pos = evt
+        pos = evt.scenePos() if hasattr(evt, 'scenePos') else evt
         if self.ui.plotWidget1.sceneBoundingRect().contains(pos):
             mousePoint = self.ui.plotWidget1.getViewBox().mapSceneToView(pos)
-            index = int(mousePoint.x())
-            y_value= int(mousePoint.y())
-             # Aktualisiere die Position der Linien
-            self.vLine1.setPos(mousePoint.x())
-            self.hLine1.setPos(mousePoint.y())
-            if index >= 0 and index < len(self.zeiten):
-                self.ui.statusbar.showMessage(f'Fledermäuse  Zeit: {self.zeiten[index]}, Wert: {y_value:.2f}')
+            self.ui.label1.setText(f"X: {mousePoint.x():.2f}, Y: {mousePoint.y():.2f}")
+            self.ui.label1.setPos(mousePoint.x(), mousePoint.y())
+            self.ui.label1.show()
         elif self.ui.plotWidget2.sceneBoundingRect().contains(pos):
             mousePoint = self.ui.plotWidget2.getViewBox().mapSceneToView(pos)
-            index = int(mousePoint.x())
-            y_value= int(mousePoint.y())
-             # Aktualisiere die Position der Linien
-            self.vLine2.setPos(mousePoint.x())
-            self.hLine2.setPos(mousePoint.y())
-            if index >= 0 and index < len(self.zeiten):
-                self.ui.statusbar.showMessage(f'Umwelt  Zeit: {self.zeiten[index]}, Temperatur: {self.yTemp[y_value]:.2f}')
+            self.ui.label2.setText(f"X: {mousePoint.x():.2f}, Y: {mousePoint.y():.2f}")
+            self.ui.label2.setPos(mousePoint.x(), mousePoint.y())
+            self.ui.label2.show()
+
+                
            
 
     def process_data(self, data, sc_factor: scalefactor):

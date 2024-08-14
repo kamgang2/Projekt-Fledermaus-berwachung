@@ -240,9 +240,10 @@ for key, average in averages.items():
 
     """
 
+"""
 import pyqtgraph.examples
 pyqtgraph.examples.run()
-
+"""
 
 """
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QSpinBox, QLabel
@@ -710,3 +711,53 @@ def data_lesen(lese_datei):
         print(f"Datei {lese_datei} nicht gefunden.")
         return []
 """
+
+import pyqtgraph as pg
+from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QWidget
+import sys
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.setWindowTitle("Test Window")
+        
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget)
+        
+        self.plotWidget1 = pg.PlotWidget()
+        self.plotWidget2 = pg.PlotWidget()
+        self.layout.addWidget(self.plotWidget1)
+        self.layout.addWidget(self.plotWidget2)
+        
+        # Create InfiniteLines
+        self.vLine1 = pg.InfiniteLine(angle=90, movable=False)
+        self.hLine1 = pg.InfiniteLine(angle=0, movable=False)
+        self.plotWidget1.addItem(self.vLine1)
+        self.plotWidget1.addItem(self.hLine1)
+
+        self.vLine2 = pg.InfiniteLine(angle=90, movable=False)
+        self.hLine2 = pg.InfiniteLine(angle=0, movable=False)
+        self.plotWidget2.addItem(self.vLine2)
+        self.plotWidget2.addItem(self.hLine2)
+
+        # Connect signals
+        self.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
+        self.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
+
+    def onMouseMoved(self, evt):
+        pos = evt.scenePos() if hasattr(evt, 'scenePos') else evt
+        if self.plotWidget1.sceneBoundingRect().contains(pos):
+            mousePoint = self.plotWidget1.getViewBox().mapSceneToView(pos)
+            self.vLine1.setPos(mousePoint.x())
+            self.hLine1.setPos(mousePoint.y())
+        elif self.plotWidget2.sceneBoundingRect().contains(pos):
+            mousePoint = self.plotWidget2.getViewBox().mapSceneToView(pos)
+            self.vLine2.setPos(mousePoint.x())
+            self.hLine2.setPos(mousePoint.y())
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
