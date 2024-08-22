@@ -62,8 +62,8 @@ class Ui_MainWindow(object):
         title_font = QFont('Arial', 14)  # 'Arial' ist die Schriftart, 14pt ist die Schriftgröße
         self.plotWidget1.getPlotItem().setTitle('Ein- und Aus-Fluege über die Zeit', color='black', size='14pt', font=title_font)
         
-        self.label1 = pg.LabelItem(justify='left')
-        self.plotWidget1.addItem(self.label1)
+        # self.label1 = pg.LabelItem(justify='left')
+        # self.plotWidget1.addItem(self.label1)
         
 
         self.plotWidget1.setObjectName(u"plotWidget1")
@@ -84,9 +84,7 @@ class Ui_MainWindow(object):
         self.tab2Layout.addWidget(self.plotWidget2)
         self.tabWidget.addTab(self.tab2, "Umweltmessungen")
 
-           # Create Labels
-        self.label2 = pg.LabelItem(justify='left')
-        self.plotWidget2.addItem(self.label2)
+       
         
       
        
@@ -178,6 +176,8 @@ class Ui_MainWindow(object):
         self.menuDatei.setObjectName( u"menuDatei")
         self.actionExportExcel = QAction(QIcon("icons/file-xls.png"), u"als Excel exportieren", MainWindow)
         self.menuDatei.addAction(self.actionExportExcel)
+        self.actionDateiLoeschen = QAction("Backup Loeschen")
+        self.menuDatei.addAction(self.actionDateiLoeschen)
 
         self.menuAnsicht = QMenu(self.menubar)
         self.menuAnsicht.setObjectName(u"menuAnsicht")
@@ -212,46 +212,6 @@ class Ui_MainWindow(object):
         self.toggle_sidebar_action = QAction("Einzelne Temperature")
         self.menubar.addAction(self.toggle_sidebar_action)
 
-
-        # #Side animated Window to Temperatur one by one
-        #  #open the sidebar
-        #   # Seitenbereich
-        # self.sidebar = QWidget()
-        # self.sidebar.setStyleSheet("background-color: lightgray;")
-        # #self.sidebar.setFixedWidth(200)
-        # self.sidebar.move(800, -100)
-
-        # # Seitenbereichs-Layout
-        # sidebar_layout = QGridLayout(self.sidebar)
-
-        # # Erste LCD-Anzeige
-        # self.lcd_first_temp = QLCDNumber()
-        # self.lcd_first_temp_label = QLabel("Temp1")
-        # sidebar_layout.addWidget(self.lcd_first_temp,0,0, 1, 3)
-        # sidebar_layout.addWidget(self.lcd_first_temp_label, 1, 0, 1,1 )
-
-        # # Zweite LCD-Anzeige
-        # self.lcd_sec_temp = QLCDNumber()
-        # self.lcd_sec_temp_label = QLabel("Temp2")
-        # sidebar_layout.addWidget(self.lcd_sec_temp, 2, 0, 1, 3)
-        # sidebar_layout.addWidget(self.lcd_sec_temp_label, 3,0,1,1)
-
-        # # Dritte LCD-Anzeige
-        # self.lcd_third_temp = QLCDNumber()
-        # self.lcd_third_temp_label = QLabel("Temp2")
-        # sidebar_layout.addWidget(self.lcd_third_temp, 4, 0, 1, 3)
-        # sidebar_layout.addWidget(self.lcd_third_temp_label, 5,0,1,1)
-
-
-        # # Animation
-        # self.animation = QPropertyAnimation(self.sidebar, b"geometry")
-        # self.animation.setDuration(500)
-
-        # # Initialer Zustand der Seitenleiste
-        # self.sidebar_open = False
-        # self.sidebar.hide()
-
-        # self.gridLayout.addWidget(self.sidebar, 30, 1, 1, 2)
 
 
         self.retranslateUi(MainWindow)

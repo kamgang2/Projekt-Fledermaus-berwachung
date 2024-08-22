@@ -44,7 +44,9 @@ def file_writter(serial_port1, serial_port2, ser1, ser2, output_file):
                         data2 = None
                         time.sleep(1)  # Add a small delay to prevent high CPU usage
                     else:
-                        pass    
+                        pass  
+                
+                if data1 is not None and data2 is None
 
                 else:
                     print("No data waiting in the serial buffer.")
@@ -77,6 +79,7 @@ def data_lesen(lese_datei):
         except FileNotFoundError:
             print(f"Datei {lese_datei} nicht gefunden.")
             return []
+        
 
 def data_lesen_zeitraum(lese_datei,date1, date2, dialog):
     options = QFileDialog.Options()

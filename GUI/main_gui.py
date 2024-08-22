@@ -122,6 +122,9 @@ class MainWindow(QMainWindow):
 
         # Save the Data in Excel file 
         self.ui.actionExportExcel.triggered.connect(self.data_in_excel_speichern)
+
+        # Backup Datei löschen
+        self.ui.actionDateiLoeschen.triggered.connect( self.clear_text_file)
         
         #open the sidebar
           # Seitenbereich
@@ -191,16 +194,6 @@ class MainWindow(QMainWindow):
         self.sidebar_open = False
         self.ui.toggle_sidebar_action.triggered.connect(self.toggle_sidebar)
 
-        # #Window to show the mouse's Position
-        # self.mouse_position1 = pg.TextItem( anchor=(0, 1), color= 'red', border='red')
-        # self.mouse_position1.setZValue(10)
-        # self.mouse_position1.setPos(10, 10)
-        # self.mouse_position2 = pg.TextItem(anchor= (0, 1), color= 'red', border= 'red')
-        # self.mouse_position2.setZValue(10)
-        # self.mouse_position2.setPos(10, 10)
-        # self.ui.plotWidget1.addItem(self.mouse_position1)
-        # self.ui.plotWidget2.addItem(self.mouse_position2)
-        # Connect the mouse movement signal to the update function
         self.ui.plotWidget1.scene().sigMouseMoved.connect(self.onMouseMoved)
         self.ui.plotWidget2.scene().sigMouseMoved.connect(self.onMouseMoved)
 
@@ -264,21 +257,6 @@ class MainWindow(QMainWindow):
         p1 = self.ui.plotWidget2
         p2 =  self.ui.viewBox 
 
-        # # Erstelle die Linien für das Crosshair
-        # self.vLine1 = pg.InfiniteLine(angle=90, movable=False)
-        # self.hLine1 = pg.InfiniteLine(angle=0, movable=False)
-        # self.vLine2 = pg.InfiniteLine(angle=90, movable=False)
-        # self.hLine2 = pg.InfiniteLine(angle=0, movable=False)
-
-        # self.ui.plotWidget1.addItem(self.vLine1, ignoreBounds=True)
-        # self.ui.plotWidget1.addItem(self.hLine1, ignoreBounds=True)
-
-        # self.ui.plotWidget2.addItem(self.vLine2, ignoreBounds=True)
-        # self.ui.plotWidget2.addItem(self.hLine2, ignoreBounds=True)
-
-
-        
-    
         self.data = data_lesen(self.output_file)
         if not self.data:
             return
@@ -383,18 +361,24 @@ class MainWindow(QMainWindow):
             self.ui.plotWidget2.setMouseTracking(True)
 
     def onMouseMoved(self, evt):
-        pos = evt.scenePos() if hasattr(evt, 'scenePos') else evt
-        if self.ui.plotWidget1.sceneBoundingRect().contains(pos):
-            mousePoint = self.ui.plotWidget1.getViewBox().mapSceneToView(pos)
-            self.ui.label1.setText(f"X: {mousePoint.x():.2f}, Y: {mousePoint.y():.2f}")
-            self.ui.label1.setPos(mousePoint.x(), mousePoint.y())
-            self.ui.label1.show()
-        elif self.ui.plotWidget2.sceneBoundingRect().contains(pos):
-            mousePoint = self.ui.plotWidget2.getViewBox().mapSceneToView(pos)
-            self.ui.label2.setText(f"X: {mousePoint.x():.2f}, Y: {mousePoint.y():.2f}")
-            self.ui.label2.setPos(mousePoint.x(), mousePoint.y())
-            self.ui.label2.show()
-
+        pos = evt
+        # Überprüfe, welcher Tab aktiv ist und leite das Ereignis an das entsprechende Plot-Widget weiter
+        if self.ui.tabWidget.currentIndex() == 0:  # plotWidget1 aktiv
+            if self.ui.plotWidget1.sceneBoundingRect().contains(pos):
+                
+                mousePoint = self.ui.plotWidget1.getViewBox().mapSceneToView(pos)
+                index = int(mousePoint.x())
+                y_value = int(mousePoint.y())
+                if index >= 0 and index < len(self.zeiten):
+                    self.ui.statusbar.showMessage(f'DATUM: {self.zeiten[int(mousePoint.x())]},  WERT: {mousePoint.y()}')
+        elif self.ui.tabWidget.currentIndex() == 1:  # plotWidget2 aktiv
+            if self.ui.plotWidget2.sceneBoundingRect().contains(pos):
+                
+                mousePoint = self.ui.plotWidget2.getViewBox().mapSceneToView(pos)
+                index = int(mousePoint.x())
+                y_value = int(mousePoint.y())
+                if index >= 0 and index < len(self.zeiten):
+                    self.ui.statusbar.showMessage(f'DATUM: {self.zeiten[index]}, Temperatur: {self.yTemp[y_value]:.2f}, Luftfeuchtigkeit: {self.yLuft[y_value]}')
                 
            
 
@@ -491,6 +475,21 @@ class MainWindow(QMainWindow):
             print("Dialog akzeptiert")
         else:
             print("Dialog abgelehnt")
+
+    def clear_text_file(self):
+        """Löscht den gesamten Inhalt einer Textdatei."""
+        file_path = self.output_file
+        dialog = QDialog
+        try:
+            with open(file_path, 'w') as file:
+                file.truncate(0)  # Dateiinhalt auf 0 Bytes reduzieren
+                file.close()
+            print(f"Der Inhalt der Datei '{file_path}' wurde erfolgreich gelöscht.")
+            QMessageBox.information(self, "Erfolg", f"die Backups Daten wurden erfolgreich '{file_path}' gelöscht")
+            dialog.accept()
+        except Exception as e:
+            print(f"Fehler beim Löschen des Inhalts der Datei: {e}") 
+
 
 
     def monitor_serial_ports(self):
