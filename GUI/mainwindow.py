@@ -171,12 +171,12 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(u"menubar")
         MainWindow.setMenuBar(self.menubar)
         self.menuDatei = QMenu(u"Datei",self.menubar)
-        self.menuDatei.setIcon(QIcon("icons/menu-burger.png"))
+        #self.menuDatei.setIcon(QIcon("icons/menu-burger.png"))
 
         self.menuDatei.setObjectName( u"menuDatei")
         self.actionExportExcel = QAction(QIcon("icons/file-xls.png"), u"als Excel exportieren", MainWindow)
         self.menuDatei.addAction(self.actionExportExcel)
-        self.actionDateiLoeschen = QAction("Backup Loeschen")
+        self.actionDateiLoeschen = QAction("Daten Loeschen")
         self.menuDatei.addAction(self.actionDateiLoeschen)
 
         self.menuAnsicht = QMenu(self.menubar)
@@ -205,9 +205,9 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuEinstellung.menuAction())
 
         # Füge ein leeres QMenu hinzu, um Abstand zu erzeugen
-        spacer_menu = QMenu("         ", self.menubar)  # Leeres Menü ohne Titel
-        spacer_menu.setObjectName("spacer")
-        self.menubar.addMenu(spacer_menu)
+        #spacer_menu = QMenu("                              ", self.menubar)  # Leeres Menü ohne Titel
+        #spacer_menu.setObjectName("spacer")
+        #self.menubar.addMenu(spacer_menu)
 
         self.toggle_sidebar_action = QAction("Einzelne Temperature")
         self.menubar.addAction(self.toggle_sidebar_action)
@@ -224,7 +224,7 @@ class Ui_MainWindow(object):
         self.LuftLabel.setText(QCoreApplication.translate("MainWindow", u"Luftfeuchtigkeit in %", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Anzahl der Fledermäuse", None))
         self.plotButton.setText(QCoreApplication.translate("MainWindow", u"Aktualisieren", None))
-        self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Datei", None))
+        self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Dateimanager", None))
         self.menuAnsicht.setTitle(QCoreApplication.translate("MainWindow", u"Ansicht", None))
         self.actionSetAnzFledermause.setText(QCoreApplication.translate("MainWindow", u"Set Anz der Fledermause", None))
 

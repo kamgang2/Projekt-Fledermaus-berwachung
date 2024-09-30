@@ -43,10 +43,10 @@ def file_writter(serial_port1, serial_port2, ser1, ser2, output_file):
                         data1 = None
                         data2 = None
                         time.sleep(1)  # Add a small delay to prevent high CPU usage
-                    else:
-                        pass  
+                #     else:
+                #         pass  
                 
-                if data1 is not None and data2 is None
+                # if data1 is not None and data2 is None
 
                 else:
                     print("No data waiting in the serial buffer.")

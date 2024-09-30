@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox, QWidget, QFrame, QGridLayout
+from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox, QPushButton, QFrame, QGridLayout
 from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
 from mainwindow import Ui_MainWindow  
 from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread
@@ -183,6 +183,14 @@ class MainWindow(QMainWindow):
         self.lcd_third_hum_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
         sidebar_layout.addWidget(self.lcd_third_hum, 4, 3, 1, 3)
         sidebar_layout.addWidget(self.lcd_third_hum_label, 5,3,1,1)
+
+        # Schließen-Button erstellen
+        close_button = QPushButton("Schließen")
+        close_button.setStyleSheet("background-color: red; color: white;")
+        close_button.clicked.connect(self.toggle_sidebar)
+
+        # Button zum Layout hinzufügen
+        sidebar_layout.addWidget(close_button)
 
 
 
