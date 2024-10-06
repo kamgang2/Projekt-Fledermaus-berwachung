@@ -539,6 +539,8 @@ void loop() {
      Serial.print("Extracted value: ");
      Serial.println(extractedValue);
      Gesamtanzahl = extractedValue; 
+     anzahlEinfluege = 0 ; 
+     anzahlAusfluege = 0 ; 
      //EEPROM.update(EEPROMAddr, extractedValue);
      newData = false;  // Reset the flag
   }

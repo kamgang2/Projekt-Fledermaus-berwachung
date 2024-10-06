@@ -85,6 +85,9 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab2, "Umweltmessungen")
 
        
+       
+        self.label1 = QLabel()
+        self.label2 = QLabel()
         
       
        

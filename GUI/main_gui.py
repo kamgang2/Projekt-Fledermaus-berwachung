@@ -2,11 +2,12 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, Q
 from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
 from mainwindow import Ui_MainWindow  
 from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread
-from file_handler import file_writter, data_lesen, data_lesen_zeitraum
+from file_handler import file_writter, data_lesen, data_lesen_zeitraum, FileWriterWorker
 from splashscreen import VideoSplashScreen
 import sys
 import pyqtgraph as pg
-from PySide6.QtCore import Qt, Slot, QRect, QPropertyAnimation
+from PySide6.QtCore import Qt, Slot, QRect, QPropertyAnimation, QThread
+from PySide6 import QtConcurrent
 import serial
 import os
 import time
@@ -54,6 +55,7 @@ class MainWindow(QMainWindow):
         except serial.SerialException as e:
             print(f"Error opening serial port {self.serial_port1}: {e}")
             print(f"Error opening serial port {self.serial_port2}: {e}")
+            self.show_message()
             self.ser1 = None
             self.ser2 = None
             
@@ -190,7 +192,7 @@ class MainWindow(QMainWindow):
         close_button.clicked.connect(self.toggle_sidebar)
 
         # Button zum Layout hinzufügen
-        sidebar_layout.addWidget(close_button)
+        sidebar_layout.addWidget(close_button, 6,3, 1, 1)
 
 
 
@@ -210,7 +212,7 @@ class MainWindow(QMainWindow):
         self.ui.plotButton.clicked.connect(self.plot_data)
         
          
-        self.start_file_writer()
+        #self.start_file_writer()
         
         self.file_watcher = FileWatcher(os.path.join(os.path.dirname(__file__),  self.output_file))
         self.file_watcher.start()
@@ -518,15 +520,34 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def start_file_writer(self):
-        if self.ser1 and self.ser2:
-            # Thread for file writing
-            print("Thread for file_writer")
-            thread_file_writer = threading.Thread(
-                target=file_writter,
-                args=(self.serial_port1, self.serial_port2, self.ser1, self.ser2, self.output_file),
-                daemon=True
-            )
-            thread_file_writer.start()
+         if True:  # Hier deine Bedingung für die seriellen Ports
+            # Erstelle den Worker und den Thread
+            self.worker = FileWriterWorker(self.serial_port1, self.serial_port2, self.ser1, self.ser2, self.output_file)
+            self.thread = QThread()
+
+            # Verbinde Worker mit dem Thread
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.worker.finished.connect(self.thread.quit)
+            self.worker.finished.connect(self.worker.deleteLater)
+            self.thread.finished.connect(self.thread.deleteLater)
+
+            # Starte den Thread
+            self.thread.start()
+            print("File writer started in background thread.")
+             # Verbinde das Signal mit einem Slot, um die Nachricht anzuzeigen
+            self.worker.finished.connect(self.show_message)
+
+    def show_message(self):
+        # Zeigt eine Nachricht an, wenn das Signal gesendet wird
+        with open('style.qss', 'r') as file:
+            self.setStyleSheet(file.read())
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("Ein Microcontroller wurde getrennt \nVerbindung überprüfen und das Programm neu starten !")
+        msg.setWindowTitle("Arduino Getrennt")
+        msg.exec()
+            
 
     def toggle_sidebar(self):
         if self.sidebar_open:
@@ -547,11 +568,18 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-     # Create and show the video splash screen
+
+    # Erstellen und Anzeigen des Video-Splash-Screens
     splash = VideoSplashScreen("0728.mp4")
+    
+    # Überprüfen, ob der Splash-Screen korrekt beendet wurde
     if splash.exec() == QDialog.Accepted:
-        # Show the main window after the splash screen
+        # Zeige das Hauptfenster nach dem Splash-Screen
         main_window = MainWindow()
         main_window.show()
 
+        # Starte den Hintergrund-Worker für file_writer
+        main_window.start_file_writer()
+
+    # Beende die Anwendung korrekt
     sys.exit(app.exec())

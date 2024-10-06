@@ -4,12 +4,31 @@ import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, PatternFill, Border, Side
 from PySide6.QtWidgets import QFileDialog, QMessageBox
+from PySide6.QtCore import Signal, QObject
 
 
-def file_writter(serial_port1, serial_port2, ser1, ser2, output_file): 
+class FileWriterWorker(QObject):
+    finished = Signal()
+
+    def __init__(self, serial_port1, serial_port2, ser1, ser2, output_file):
+        super().__init__()
+        self.serial_port1 = serial_port1
+        self.serial_port2 = serial_port2
+        self.ser1 = ser1
+        self.ser2 = ser2
+        self.output_file = output_file
+
+    def run(self):
+        # Hier der Datei-Schreibprozess, der im Hintergrund läuft
+        print("Writing to file in the background...")
+        # Simuliere Schreibprozess
+        file_writter(self.serial_port1, self.serial_port2,self.ser1, self.ser2, self.output_file, self.finished)
+        self.finished.emit()
+
+
+def file_writter(serial_port1, serial_port2, ser1, ser2, output_file, signal): 
     data1 = None
     data2 = None
-
         # Open the file to write the data
     
     try:
@@ -54,12 +73,12 @@ def file_writter(serial_port1, serial_port2, ser1, ser2, output_file):
     except KeyboardInterrupt:
         print("Program interrupted. Closing...")
     except serial.SerialException as e:
+        signal.emit()  # Emit error signal
         print(f"Serial communication error: {e}")
+      
     finally:
-       # print(f"Disconnected from {serial_port1} and {serial_port2}.")   
-       if ser1 :
-           QMessageBox.warning(None , "Warning", "Micron 1", buttons=QMessageBox.Ok, defaultButton=QMessageBox.NoButton)
-
+        print(f"Disconnected from {serial_port1} and {serial_port2}.")   
+      
 
 
 def data_lesen(lese_datei):

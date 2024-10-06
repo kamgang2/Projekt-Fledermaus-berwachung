@@ -43,6 +43,7 @@ QTabBar::tab:selected {
 
 QTabBar::tab:hover {
     background: #D0E8F3; /* Hintergrund der Tabs bei Hover */
+    
 }
 
 
@@ -68,6 +69,7 @@ QMenu {
     
 }
 
+
 /* Schriftart und Stil für die Menüeinträge */
 QMenu::item {
     font-family: 'Arial';  /* Ersetze durch den Namen deiner Schriftart */
@@ -80,16 +82,7 @@ QMenu::item {
 QMenu::item:selected {
     background: #007ACC;  /* Hintergrundfarbe beim Hover */
     color: #FFFFFF;  /* Textfarbe beim Hover */
-}
-
-#spacer:hover {
-    /* Setze alle relevanten Stile zurück, um Hover-Effekte zu verhindern */
-    all: unset;
-    background: none;
-    color: inherit;  /* Vererbt die ursprüngliche Textfarbe, falls vorhanden */
-    border: none;
-    box-shadow: none;  /* Entfernt jeglichen Schatteneffekt */
-    cursor: default;  /* Verhindert, dass der Cursor sich verändert */
+  
 }
 
 QDialog {

@@ -244,7 +244,7 @@ class Handler(FileSystemEventHandler):
             print(f"Watchdog detected that {event.src_path} has been deleted.")
 
 
-class FileWatcher(QObject):
+class FileWatcher(QThread):
     file_modified = Signal()
 
     def __init__(self, file_path):
@@ -275,7 +275,9 @@ class FileWatcher(QObject):
         print("File watcher thread stopped.")
 
     def stop(self):
-        self.observer.stop()
+        if self.observer:
+            self.observer.stop()
+
                 
 
 class SerialMonitorThread(QThread):
