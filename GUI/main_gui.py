@@ -1,16 +1,14 @@
-
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox, QPushButton, QFrame, QGridLayout
 from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
-from GuiAnwendung.gui.mainwindow import Ui_MainWindow  
-from GuiAnwendung.gui.Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread
-from GuiAnwendung.gui.file_handler import file_writter, data_lesen, data_lesen_zeitraum, FileWriterWorker
-from GuiAnwendung.gui.splashscreen import VideoSplashScreen
-
+from mainwindow import Ui_MainWindow  
+from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread
+from file_handler import file_writter, data_lesen, data_lesen_zeitraum, FileWriterWorker
+from splashscreen import VideoSplashScreen
+import sys
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, Slot, QRect, QPropertyAnimation, QThread
 from PySide6 import QtConcurrent
 import serial
-import sys
 import os
 import time
 import threading
@@ -46,7 +44,7 @@ class MainWindow(QMainWindow):
         self.lock = threading.Lock() 
         self.setWindowTitle("FLEDERMAUSTRACKER")
 
-        self.setWindowIcon(QIcon(resource_path("assets/icons/gui_icon.png")))
+        self.setWindowIcon(QIcon(resource_path("icons/gui_icon.png")))
 
 
        # Configure the serial port and the baud rate
