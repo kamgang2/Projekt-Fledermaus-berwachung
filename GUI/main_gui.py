@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):
                 index = int(mousePoint.x())
                 y_value = int(mousePoint.y())
                 if index >= 0 and index < len(self.zeiten):
-                    self.ui.statusbar.showMessage(f'DATUM: {self.zeiten[index]}, Temperatur: {self.yTemp[y_value]:.2f}, Luftfeuchtigkeit: {self.yLuft[y_value]}')
+                    self.ui.statusbar.showMessage(f'DATUM: {self.zeiten[index]}, Temperatur: {self.yTemp[y_value]:.2f}°C, Luftfeuchtigkeit: {self.yLuft[y_value]}%')
                 
            
 
