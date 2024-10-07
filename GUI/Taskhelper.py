@@ -7,7 +7,16 @@ import os
 import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import sys
 
+
+# resource_path Funktion, um den Pfad zu eingebetteten Dateien zu finden
+def resource_path(relative_path):
+    """Ermittelt den Pfad zur eingebetteten Datei in einer .exe-Datei."""
+    if hasattr(sys, '_MEIPASS'):
+        # PyInstaller speichert Ressourcen im temporären Verzeichnis _MEIPASS
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class scalefactor(Enum): 
     Normal =1 
@@ -171,7 +180,7 @@ class SpinBoxDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Anzahl der Fledermauser")
         # Load and apply the stylesheet
-        with open('style.qss', 'r') as file:
+        with open(resource_path('style.qss', 'r')) as file:
             self.setStyleSheet(file.read())
 
         self.layout = QVBoxLayout(self)
@@ -201,7 +210,7 @@ class SpinBoxDialog(QDialog):
 # Funktion zur Uberwachung des "serial_data.txt"
 
 class OnMyWatch: 
-    watch_file = os.path.join(os.path.dirname(__file__),"serial_data.txt")
+    watch_file = os.path.join(os.path.dirname(__file__),resource_path("serial_data.txt"))
     file_modified = False
 
     def __init__(self):
@@ -298,3 +307,4 @@ class SerialMonitorThread(QThread):
                 self.warning_signal.emit("Serial Port Error", f"Serial port {self.serial_port2} is not available.")
                 self.ser2 = None
 
+                

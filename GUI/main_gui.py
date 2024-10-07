@@ -26,6 +26,14 @@ class CustomAxisItem(pg.AxisItem):
             v_str = self.labels.get(v, "")
             strings.append(v_str)
         return strings
+    
+# resource_path Funktion, um den Pfad zu eingebetteten Dateien zu finden
+def resource_path(relative_path):
+    """Ermittelt den Pfad zur eingebetteten Datei in einer .exe-Datei."""
+    if hasattr(sys, '_MEIPASS'):
+        # PyInstaller speichert Ressourcen im temporären Verzeichnis _MEIPASS
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
 
@@ -36,14 +44,14 @@ class MainWindow(QMainWindow):
         self.lock = threading.Lock() 
         self.setWindowTitle("FLEDERMAUSTRACKER")
 
-        self.setWindowIcon(QIcon("icons/gui_icon.png"))
+        self.setWindowIcon(QIcon(resource_path("icons/gui_icon.png")))
 
 
        # Configure the serial port and the baud rate
         self.serial_port1 = 'COM4'  # Replace with your serial port
         self.serial_port2 = 'COM9'
         self.baud_rate = 9600
-        self.output_file = 'serial_data.txt'
+        self.output_file = resource_path('serial_data.txt')
         
         try:
             # Open the serial port
@@ -456,7 +464,7 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("Daten in Excel Datei speichern")
 
           # Load and apply the stylesheet
-        with open('style.qss', 'r') as file:
+        with open(resource_path('style.qss', 'r')) as file:
             dialog.setStyleSheet(file.read())
     
         # Layout und Widgets für den Dialog
@@ -540,7 +548,7 @@ class MainWindow(QMainWindow):
 
     def show_message(self):
         # Zeigt eine Nachricht an, wenn das Signal gesendet wird
-        with open('style.qss', 'r') as file:
+        with open(resource_path('style.qss', 'r'))as file:
             self.setStyleSheet(file.read())
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -570,7 +578,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Erstellen und Anzeigen des Video-Splash-Screens
-    splash = VideoSplashScreen("0728.mp4")
+    splash = VideoSplashScreen(resource_path("0728.mp4"))
     
     # Überprüfen, ob der Splash-Screen korrekt beendet wurde
     if splash.exec() == QDialog.Accepted:
