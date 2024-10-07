@@ -180,7 +180,8 @@ class SpinBoxDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Anzahl der Fledermauser")
         # Load and apply the stylesheet
-        with open(resource_path('style.qss', 'r')) as file:
+        with open(resource_path('style.qss'), 'r') as file:
+
             self.setStyleSheet(file.read())
 
         self.layout = QVBoxLayout(self)
@@ -307,4 +308,3 @@ class SerialMonitorThread(QThread):
                 self.warning_signal.emit("Serial Port Error", f"Serial port {self.serial_port2} is not available.")
                 self.ser2 = None
 
-                
