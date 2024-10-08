@@ -212,7 +212,7 @@ class Ui_MainWindow(object):
         #spacer_menu.setObjectName("spacer")
         #self.menubar.addMenu(spacer_menu)
 
-        self.toggle_sidebar_action = QAction("Einzelne Temperature")
+        self.toggle_sidebar_action = QAction("Einzelne Messdaten")
         self.menubar.addAction(self.toggle_sidebar_action)
 
 

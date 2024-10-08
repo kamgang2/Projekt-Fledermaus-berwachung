@@ -8,6 +8,16 @@ import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import sys
+import serial.tools.list_ports
+
+def find_arduino(serial_number):
+    """ function to find which port has received which arduino with the help of serial number"""
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if port.serial_number == serial_number:
+            return port.device
+    return None
+
 
 
 # resource_path Funktion, um den Pfad zu eingebetteten Dateien zu finden
@@ -307,4 +317,7 @@ class SerialMonitorThread(QThread):
             if not self.ser2:
                 self.warning_signal.emit("Serial Port Error", f"Serial port {self.serial_port2} is not available.")
                 self.ser2 = None
+
+
+
 

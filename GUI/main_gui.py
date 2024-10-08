@@ -1,13 +1,31 @@
+# This file is part of MyProject.
+#
+# MyProject is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# MyProject is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with MyProject. If not, see <https://www.gnu.org/licenses/>.
+#Gillian KAMGANG, 08.10.2024
+
+
+
 from PySide6.QtWidgets import QApplication, QMainWindow, QLCDNumber, QSpinBox, QDialog, QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QDateEdit, QMessageBox, QPushButton, QFrame, QGridLayout
 from PySide6.QtGui import QPixmap, QActionGroup, QColor, QFontDatabase, QFont, QIcon
 from mainwindow import Ui_MainWindow  
-from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread
-from file_handler import file_writter, data_lesen, data_lesen_zeitraum, FileWriterWorker
+from Taskhelper import timescaling, scalefactor, process_average_data, convert_to_datetime,read_single_Tempvalue, SpinBoxDialog,FileWatcher, SerialMonitorThread, resource_path, find_arduino
+from file_handler import data_lesen, data_lesen_zeitraum, FileWriterWorker
 from splashscreen import VideoSplashScreen
 import sys
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, Slot, QRect, QPropertyAnimation, QThread
-from PySide6 import QtConcurrent
+
 import serial
 import os
 import time
@@ -19,6 +37,7 @@ class CustomAxisItem(pg.AxisItem):
     def __init__(self, labels=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.labels = labels if labels is not None else {}
+        
 
     def tickStrings(self, values, scale, spacing):
         strings = []
@@ -26,15 +45,6 @@ class CustomAxisItem(pg.AxisItem):
             v_str = self.labels.get(v, "")
             strings.append(v_str)
         return strings
-    
-# resource_path Funktion, um den Pfad zu eingebetteten Dateien zu finden
-def resource_path(relative_path):
-    """Ermittelt den Pfad zur eingebetteten Datei in einer .exe-Datei."""
-    if hasattr(sys, '_MEIPASS'):
-        # PyInstaller speichert Ressourcen im temporären Verzeichnis _MEIPASS
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
-
 
 
 class MainWindow(QMainWindow):
@@ -42,14 +52,23 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.lock = threading.Lock() 
-        self.setWindowTitle("FLEDERMAUSTRACKER")
+        self.setWindowTitle("BATGUARD")
 
         self.setWindowIcon(QIcon(resource_path("icons/gui_icon.png")))
 
+          # Load and apply the stylesheet
+        with open(resource_path('style.qss'), 'r') as file:
+            self.setStyleSheet(file.read())
+
+        arduino_serial_number1 = "75736303336351314172"  #Arduino with data from Lichtschrank
+        arduino_serial_number2 = "75736303336351E07151"  #Arduino with data from  DHT
+
+
+
 
        # Configure the serial port and the baud rate
-        self.serial_port1 = 'COM4'  # Replace with your serial port
-        self.serial_port2 = 'COM9'
+        self.serial_port1 = find_arduino( arduino_serial_number1)
+        self.serial_port2 = find_arduino(arduino_serial_number2)
         self.baud_rate = 9600
         self.output_file = resource_path('serial_data.txt')
         
@@ -149,7 +168,7 @@ class MainWindow(QMainWindow):
         # Erste LCD-Anzeige
         self.lcd_first_temp = QLCDNumber()
         self.lcd_first_temp.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
-        self.lcd_first_temp_label = QLabel("Temp1")
+        self.lcd_first_temp_label = QLabel("TEMP1")
         self.lcd_first_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
         sidebar_layout.addWidget(self.lcd_first_temp,0,0, 1, 3)
         sidebar_layout.addWidget(self.lcd_first_temp_label, 1, 0, 1,1 )
@@ -157,7 +176,7 @@ class MainWindow(QMainWindow):
         # Zweite LCD-Anzeige
         self.lcd_sec_temp = QLCDNumber()
         self.lcd_sec_temp.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
-        self.lcd_sec_temp_label = QLabel("Temp2")
+        self.lcd_sec_temp_label = QLabel("TEMP2")
         self.lcd_sec_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
         sidebar_layout.addWidget(self.lcd_sec_temp, 2, 0, 1, 3)
         sidebar_layout.addWidget(self.lcd_sec_temp_label, 3,0,1,1)
@@ -165,7 +184,7 @@ class MainWindow(QMainWindow):
         # Dritte LCD-Anzeige
         self.lcd_third_temp = QLCDNumber()
         self.lcd_third_temp.setStyleSheet("color: black; border-radius: 16px; background: #00ABE4;")
-        self.lcd_third_temp_label = QLabel("Temp2")
+        self.lcd_third_temp_label = QLabel("TEMP3")
         self.lcd_third_temp_label.setStyleSheet("font-family: 'Arial';font-size: 16px;")
         sidebar_layout.addWidget(self.lcd_third_temp, 4, 0, 1, 3)
         sidebar_layout.addWidget(self.lcd_third_temp_label, 5,0,1,1)
@@ -464,17 +483,17 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("Daten in Excel Datei speichern")
 
           # Load and apply the stylesheet
-        with open(resource_path('style.qss', 'r')) as file:
+        with open(resource_path('style.qss'), 'r') as file:
             dialog.setStyleSheet(file.read())
     
         # Layout und Widgets für den Dialog
         layout = QVBoxLayout()
-        message1 = QLabel("Von: dd.mm.yy")
+        message1 = QLabel("Von: DD.MM.YY")
         layout.addWidget(message1)
         first_date = QDateEdit()
         first_date.setCalendarPopup(True)
         layout.addWidget(first_date)
-        message2 = QLabel("Bis: dd.mm.yy")
+        message2 = QLabel("Bis: DD.MM.YY")
         layout.addWidget(message2)
         last_date = QDateEdit()
         last_date.setCalendarPopup(True)
@@ -493,21 +512,22 @@ class MainWindow(QMainWindow):
             print("Dialog akzeptiert")
         else:
             print("Dialog abgelehnt")
+    
 
     def clear_text_file(self):
         """Löscht den gesamten Inhalt einer Textdatei."""
         file_path = self.output_file
-        dialog = QDialog
+        dialog = QDialog()  # Erstelle eine Instanz von QDialog
         try:
             with open(file_path, 'w') as file:
                 file.truncate(0)  # Dateiinhalt auf 0 Bytes reduzieren
-                file.close()
             print(f"Der Inhalt der Datei '{file_path}' wurde erfolgreich gelöscht.")
-            QMessageBox.information(self, "Erfolg", f"die Backups Daten wurden erfolgreich '{file_path}' gelöscht")
-            dialog.accept()
+            QMessageBox.information(self, "Erfolg", f"Die Backup-Daten wurden erfolgreich gelöscht: '{file_path}'")
+            dialog.accept()  # Rufe accept() auf der Dialoginstanz auf
         except Exception as e:
-            print(f"Fehler beim Löschen des Inhalts der Datei: {e}") 
-
+            print(f"Fehler beim Löschen des Inhalts der Datei: {e}")
+            QMessageBox.critical(self, "Fehler", f"Fehler beim Löschen der Datei: {e}")
+            dialog.reject()  # Optional: Schließe den Dialog mit einem Fehlerstatus
 
 
     def monitor_serial_ports(self):
@@ -548,7 +568,7 @@ class MainWindow(QMainWindow):
 
     def show_message(self):
         # Zeigt eine Nachricht an, wenn das Signal gesendet wird
-        with open(resource_path('style.qss', 'r'))as file:
+        with open(resource_path('style.qss'), 'r')as file:
             self.setStyleSheet(file.read())
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)

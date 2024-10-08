@@ -711,7 +711,7 @@ def data_lesen(lese_datei):
         print(f"Datei {lese_datei} nicht gefunden.")
         return []
 """
-
+"""
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QWidget
 import sys
@@ -761,3 +761,31 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
+"""
+
+
+import serial.tools.list_ports
+
+def find_arduino(serial_number):
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if port.serial_number == serial_number:
+            return port.device
+    return None
+
+# Beispielsweise hier die Seriennummer deines Arduinos
+arduino_serial_number1 = "75736303336351314172"
+arduino_serial_number2 = "75736303336351E07151"
+
+
+
+# Finde den richtigen COM-Port
+arduino_port1 = find_arduino(arduino_serial_number1)
+arduino_port2 = find_arduino(arduino_serial_number2)
+
+if arduino_port1:
+    print(f"Arduino gefunden an {arduino_port1}")
+    ser = serial.Serial(arduino_port1, 9600)
+    # Jetzt kannst du Daten vom Arduino lesen
+else:
+    print("Kein Arduino gefunden.")
